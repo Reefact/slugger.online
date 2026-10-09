@@ -60,7 +60,8 @@ séparément et n'ont pas la même réponse.
 
 ### 1.4 Ce qu'il ne fige pas
 
-- la direction artistique détaillée ;
+- la direction artistique détaillée — elle atterrit dans la source visuelle unique de §8.6
+  et dans les composants, parce que ce sont des valeurs que le code possède (§8.2) ;
 - les textes définitifs, marketing compris ;
 - le contenu de la documentation, qui appartient à la bibliothèque (§7.5) ;
 - le détail de ce que le playground affiche, tant que §10 est respecté.
@@ -668,6 +669,37 @@ Le slug affiché sur l'image de partage est produit au build comme les autres (�
 image qui montrerait un slug écrit à la main serait la seule surface du site à mentir, et
 la plus partagée.
 
+### 8.6 Une seule source visuelle pour les deux moitiés
+
+Le site et le playground sont deux applications, dans deux technologies, construites par
+deux chaînes d'outils (§12.1). Ils doivent se lire comme **un seul produit**, et rien dans
+ce découpage ne le garantit tout seul.
+
+L'enjeu atteint le visiteur, et c'est pour cela qu'il est ici plutôt que seulement dans un
+registre de décisions : **le playground est le seul endroit où l'on passe d'une technologie
+à l'autre sans qu'on le dise.** On clique un lien de la page principale et on arrive dans
+une application compilée en WebAssembly, sous la même adresse et sans transition annoncée.
+Une rupture visuelle à cet endroit ne se lit pas comme un changement de page : elle se lit
+comme être sorti du site, ou comme un composant tiers encastré dedans. Les deux coûtent
+exactement la confiance que §8.1 cherche à produire.
+
+La décision : **couleur, espace, typographie et mouvement ont une source unique, et elle
+traverse la frontière technologique comme un fichier, pas comme une dépendance.** La moitié
+statique l'importe ; la moitié WebAssembly la reçoit par sa propre configuration de build.
+Aucune des deux ne la redéclare.
+
+Deux conséquences, et la seconde est celle par laquelle la règle lâchera :
+
+- **aucun littéral de couleur, d'espace ou de graisse hors de cette source** — ni dans un
+  composant du site, ni dans un composant du playground ;
+- **le playground est le côté exposé.** Ses composants vivent loin du CSS du site, dans un
+  projet dont la chaîne d'outils n'est pas la même, où le réflexe est d'écrire une valeur sur
+  place, et que personne ne relit à côté de la page d'accueil. C'est là que la dérive
+  commencera, donc c'est là que le contrôle doit regarder en premier.
+
+§8.2 dit déjà que les valeurs exactes n'appartiennent pas à ce document. §8.6 ajoute
+qu'elles n'appartiennent pas non plus à deux endroits.
+
 ---
 
 ## 9. La narration
@@ -1082,6 +1114,10 @@ Le catalogue de thèmes est du site statique, pas du playground : ses pages mont
 mesures et des slugs produits **au build** (§7.6, §14.3), et rien n'y demande au visiteur de
 télécharger un runtime pour lire un tableau.
 
+Les deux moitiés partagent une source visuelle unique, et §8.6 dit comment : rien dans ce
+découpage ne les fait se ressembler, et le découpage est précisément ce qui rend la dérive
+possible.
+
 ### 12.2 Un seul artefact
 
 Le site est livré comme **un seul répertoire statique**, construit en un seul endroit, le
@@ -1375,6 +1411,7 @@ transformés en contrôles ; il est aussi la liste de ce qu'on saura *ne pas* av
 | Le playground ne présente aucun contrôle comme une validation du sens | 10.2 | Vérification des chaînes |
 | Aucun mot employé hors du vocabulaire de la bibliothèque | 5.9 | Vérification des chaînes, contre la surface publique |
 | Aucune métrique de qualité affichée | 5.10 | Vérification des chaînes |
+| Un littéral de couleur, d'espace ou de graisse hors de la source visuelle | 8.6 | Échec de build, des deux côtés |
 | Un composant présenté comme disponible sans version résoluble | 5.7 | Échec de build |
 | Une chaîne affichée écrite en dur dans un composant | 6.2 | Échec de build |
 | Un second dessin sur une page, ou un dessin qu'un texte touche | 5.8 | Test de navigateur, sur les pixels peints |
