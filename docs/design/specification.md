@@ -379,6 +379,49 @@ autre mot pour la même chose dans le guide, et un troisième dans un message d'
 que le produit est plus compliqué qu'il n'est. §11.4 demande d'enseigner chaque terme ;
 encore faut-il qu'il n'y en ait qu'un à enseigner.
 
+### 5.10 Le site ne vend pas la fabrication
+
+La bibliothèque est construite avec un soin qui se lit dans son dépôt : un portique de
+qualité, deux moteurs de mutation, des tests qui remplacent un découpage en assemblages, un
+registre de décisions, un vocabulaire fixé, une provenance signée à la publication. **Rien de
+cela n'est sur le site.**
+
+Ce n'est pas un oubli, c'est une décision, et elle est écrite ici parce qu'elle sera
+rouverte — vraisemblablement par quelqu'un qui vient de lire le dépôt et qui trouve dommage
+de ne pas le dire.
+
+Le motif est que **ce n'est pas ce qui distingue l'outil.** Ce qui le distingue est en §3.4,
+et un visiteur qui n'a pas encore compris la restriction par catégorie n'a aucune raison
+d'être impressionné par un portique. Un site qui ouvre sur sa fabrication vend l'auteur
+plutôt que l'outil, et c'est le piège classique d'une bibliothèque bien faite. §5.5 dit que
+la page principale vend et que la documentation explique ; ici c'est **le dépôt** qui
+explique, et il le fait mieux que ne le ferait une page.
+
+Ce que la décision coûte, nommé pour qu'on puisse la rouvrir en connaissance de cause : le
+lecteur qui demande ce que la bibliothèque mettra dans son build n'a pas de page qui lui
+réponde, et il doit aller au dépôt. §5.7 continue par ailleurs d'exiger qu'un état soit dit —
+une préversion est donc annoncée comme telle sur le bloc d'installation (§7.4) — mais sans la
+raison qui la cause. Un état sans son motif est admis ici ; un état tu ne l'est pas.
+
+**Une sous-règle survit à un renversement de la décision : aucune métrique de qualité,
+jamais.** Ni score de mutation, ni nombre de tests, ni couverture, ni compte
+d'avertissements. Trois motifs, et le dernier suffirait : ces chiffres sont volatils, ils
+sont invérifiables depuis l'extérieur, et le score de mutation est documenté comme instable
+par celui-même qui le mesure. §2 interdit déjà un fait dont le site n'est pas la source ;
+publier un chiffre dont la source dit qu'on ne peut pas encore s'y fier serait pire que de
+le recopier.
+
+Deux choses ne relèvent pas de cette règle, et il faut le dire ici ou elles seront
+supprimées par application zélée :
+
+- **le protocole de §3.7.** Il décrit un travail que le *visiteur* fait sur *son* thème, pas
+  un travail que l'auteur a fait sur la bibliothèque. Le premier est un outil pour le
+  lecteur, le second un titre pour le producteur ; le site porte le premier et pas le
+  second ;
+- **ce que ce document raisonne.** La règle porte sur ce que le site **affiche**. Rien
+  n'interdit à une décision d'ici d'être motivée par une contrainte de publication — §7.4
+  l'est — tant que le motif reste dans la spécification et n'arrive pas sur une page.
+
 ---
 
 ## 6. Langue
@@ -1331,6 +1374,7 @@ transformés en contrôles ; il est aussi la liste de ce qu'on saura *ne pas* av
 | Aucune description de thème que le thème ne déclare pas | 7.6, 14.2 | Génération au build ; une clé absente laisse la page muette |
 | Le playground ne présente aucun contrôle comme une validation du sens | 10.2 | Vérification des chaînes |
 | Aucun mot employé hors du vocabulaire de la bibliothèque | 5.9 | Vérification des chaînes, contre la surface publique |
+| Aucune métrique de qualité affichée | 5.10 | Vérification des chaînes |
 | Un composant présenté comme disponible sans version résoluble | 5.7 | Échec de build |
 | Une chaîne affichée écrite en dur dans un composant | 6.2 | Échec de build |
 | Un second dessin sur une page, ou un dessin qu'un texte touche | 5.8 | Test de navigateur, sur les pixels peints |
