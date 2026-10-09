@@ -49,7 +49,8 @@ ce qu'il faut pour cela » est un état. Le premier s'écrit ici, le second est 
 ### 1.3 Sa langue
 
 Le français. Son lecteur principal travaille dans cette langue, et le dépôt de la
-bibliothèque écrit déjà ses décisions et son guide d'auteur de thème en français.
+bibliothèque écrit déjà ses registres de décision dans cette langue — ses documents de
+raisonnement, par opposition à ce qu'elle publie pour ses lecteurs.
 
 C'est une exception bornée à `docs/design/`. Partout ailleurs, l'anglais : code,
 commentaires, commits, branches, titres de pull request, issues. Une exception écrite est
@@ -459,33 +460,38 @@ impossible :
 Le coût de revenir est ainsi borné à l'écriture des traductions, ce qui est le coût
 irréductible, plutôt qu'à une réécriture des composants.
 
-### 6.3 Le désaccord avec la documentation de la bibliothèque
+### 6.3 Quand la source ne publie pas dans la langue du site
 
-Il faut le nommer, parce qu'il se découvrirait autrement au moment de publier `/docs`.
+§6.1 veut que le site publie en anglais. §7.5 veut qu'il reprenne la documentation de la
+bibliothèque sans l'écrire. Les deux se contredisent dès qu'un document de la source n'existe
+pas en anglais, et ce cas se présentera — une bibliothèque dont les décisions sont rédigées en
+français n'a aucune obligation d'apparier tout ce qu'elle écrit.
 
-La bibliothèque écrit son README en anglais et **son guide d'auteur de thème en
-français**. Or §7.5 veut que le site reprenne cette documentation sans l'écrire, et §6.1
-veut qu'il publie en anglais. Les deux règles ne peuvent pas être satisfaites ensemble par
-ce site seul.
+**La règle qui tranche : le site ne traduit jamais ce que la bibliothèque a écrit.** Traduire
+serait créer une seconde source de vérité, qui dériverait de la première au premier
+correctif, et §2 existe pour empêcher exactement cela. Cette règle ne connaît pas
+d'exception, et c'est elle qui fait de §6.3 une décision plutôt qu'un embarras.
 
-**La règle qui tranche est : le site ne traduit jamais ce que la bibliothèque a écrit.**
-Traduire serait créer une seconde source de vérité, qui dériverait de la première au
-premier correctif, et §2 existe pour empêcher exactement cela.
+Le **critère** porte donc sur ce que la source publie, jamais sur la nature du document, et
+il n'a que deux issues :
 
-Deux issues, et ce document ne choisit pas laquelle arrive :
+- **la source publie l'anglais** — la route reprend le document comme n'importe quel autre ;
+- **elle ne le publie pas** — la route ne le reprend pas et **renvoie vers lui en disant dans
+  quelle langue il est**, ce qui est §5.7 appliqué à une langue.
 
-- la bibliothèque publie la moitié anglaise du document concerné, et la route le reprend
-  comme n'importe quelle autre ;
-- la route ne reprend pas ce document et **renvoie vers lui en disant qu'il est en
-  français**, ce qui est §5.7 appliqué à une langue.
+La troisième issue — le site écrit sa propre version anglaise — est exclue.
 
-Ce qui est décidé, c'est que la troisième issue — le site écrit sa propre version anglaise
-— est exclue.
+Ce que ce document **ne dit pas**, parce qu'il n'en est pas la source (§1.2) : quels documents
+sont dans quel cas à un instant donné. Cela se lit chez la source, et c'est la reprise qui le
+constate à chaque instantané. Une route qui renvoyait hier peut reprendre aujourd'hui sans que
+rien ici change.
 
-Une remarque sur l'arbitrage, parce qu'elle en déplace le coût : ce document ne cesse pas de
-grossir, et ce qu'il gagne est précisément ce que le site voudrait le plus — la façon de
-valider le sens d'un thème (§3.7). La seconde issue, celle du renvoi, devient donc
-progressivement moins acceptable. Elle reste ouverte ; elle n'est plus neutre.
+Ce qui reste vrai des deux côtés de ce constat, et qui est le vrai enjeu : **plus la source
+écrit, plus la seconde issue coûte cher.** Un renvoi vers un paragraphe est une gêne ; un
+renvoi vers ce qui explique comment valider le sens d'un thème (§3.7) prive un lecteur
+anglophone de ce que la bibliothèque a de plus précieux à lui dire. La seconde issue n'est
+donc pas neutre, et §7.3 est l'endroit où ce coût se paie : une route qui ne peut que renvoyer
+a le droit d'attendre.
 
 ---
 
