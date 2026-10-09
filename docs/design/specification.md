@@ -83,6 +83,9 @@ le site va chercher la vérité, et par quel mécanisme.
 | Les slugs affichés | Le moteur lui-même | Produits au build, graine fixe (§14.3) |
 | La prose d'un refus et celle d'une mesure | Le rendu que la bibliothèque publie (§10.4) | Rendu, jamais réécrit |
 | Contenu des pages de documentation | La documentation utilisateur de la bibliothèque, à un tag de release publié | Instantané atomique, jamais réécrit (§7.5) |
+| Ce qu'un thème dit de lui-même — intitulé, description, auteur, origine, dates | Le bloc descriptif que le thème porte et que le moteur ne consulte jamais, et la commande qui l'affiche | Lu au build ; une clé absente n'est jamais suppléée (§5.7, §7.6) |
+| Le nom de chaque chose — slug, terme, mot, nom, épithète, jeton, segment | Le vocabulaire que la bibliothèque fixe, et les types de sa surface publique qui le portent en anglais | Employé tel quel (§5.9) |
+| Le protocole qui valide le sens d'un thème, et ce qu'un thème livré lui doit | Le guide d'auteur de thème de la bibliothèque | Repris ou renvoyé selon §6.3, jamais réécrit (§3.7) |
 | Données du comparatif | Un fichier de contenu validé par schéma, daté | Rendu depuis ce fichier (§11) |
 
 **Règle générale.** Si le site affiche une information dont la bibliothèque, un paquet ou
@@ -208,6 +211,32 @@ Un troisième point n'est pas un avertissement mais une honnêteté, et il gagne
 employé, ni qu'un participe prête une intention à une pierre. C'est pour cela que
 l'exclusion d'un mot pour un nom précis existe **dans le thème** — là où le générateur de
 référence a dû coder en dur le refus d'une paire malheureuse.
+
+Ce que le produit fait de cette limite n'est pas rien, et c'est §3.7.
+
+### 3.7 Le protocole qui valide le sens
+
+La bibliothèque documente la façon de trouver ce que le chargement ne peut pas voir : des
+familles de défaut nommées, des phases dans un ordre qui compte, et des thèmes livrés qui y
+sont passés.
+
+C'est un **troisième argument**, et le plus rare des trois. §3.4 nomme deux manques que
+slugger comble chez ses voisins ; celui-ci n'est pas un manque de la concurrence, c'est un
+manque du problème. Un outil qui dit comment vérifier ce qu'il ne sait pas vérifier
+lui-même est une chose qu'on ne rencontre presque jamais, et le site le présente comme tel.
+
+Trois conséquences ailleurs dans ce document :
+
+- le catalogue dit d'un thème qu'il est passé par là, quand il l'est (§7.6) ;
+- le playground porte la seule phase qui soit mécanique, et **jamais les autres** (§10.2) ;
+- la prose du protocole appartient à la bibliothèque, pas au site (§2, §6.3).
+
+Et une contrainte éditoriale qui vaut plus que les trois : **le site ne présente jamais le
+protocole comme quelque chose que l'outil fait.** C'est un travail, qui se compte en passes
+de relecture, et le document qui le décrit l'assume en publiant ses propres rendements. Le
+présenter comme une fonctionnalité promettrait de l'automatisme là où il y a de la
+discipline — et cette promesse-là se découvre fausse au premier essai, ce qui est le pire
+moment.
 
 ---
 
@@ -335,6 +364,21 @@ Les modalités sont celles qui gardent cette réponse vraie :
 Le contrôle ne voit que les dessins qui se déclarent comme tels. Un dessin ajouté sans
 cette marque lui échappe : c'est la limite du garde-fou, écrite ici plutôt que découverte.
 
+### 5.9 Le site emploie les mots de la bibliothèque
+
+La bibliothèque fixe son vocabulaire dans un document à elle : un mot par niveau, et un
+seul, parce qu'un même mot en désignait deux. Ce que le site appelle les choses vient de là
+et de nulle part ailleurs.
+
+Ce document est en français ; les mots, eux, existent en anglais sur la surface publique du
+moteur, qui les porte en types. Le site n'a donc rien à traduire (§6.3) : il lit les noms
+que le code expose, et le document reste le raisonnement qui les a choisis.
+
+L'enjeu n'est pas la cohérence pour elle-même. Un visiteur qui lit un mot sur le site, un
+autre mot pour la même chose dans le guide, et un troisième dans un message d'erreur conclut
+que le produit est plus compliqué qu'il n'est. §11.4 demande d'enseigner chaque terme ;
+encore faut-il qu'il n'y en ait qu'un à enseigner.
+
 ---
 
 ## 6. Langue
@@ -388,6 +432,11 @@ Deux issues, et ce document ne choisit pas laquelle arrive :
 
 Ce qui est décidé, c'est que la troisième issue — le site écrit sa propre version anglaise
 — est exclue.
+
+Une remarque sur l'arbitrage, parce qu'elle en déplace le coût : ce document ne cesse pas de
+grossir, et ce qu'il gagne est précisément ce que le site voudrait le plus — la façon de
+valider le sens d'un thème (§3.7). La seconde issue, celle du renvoi, devient donc
+progressivement moins acceptable. Elle reste ouverte ; elle n'est plus neutre.
 
 ---
 
@@ -450,6 +499,13 @@ ces deux-là ne s'installent pas de la même façon ni pour le même lecteur. La
 donc au moins ces deux emplacements dès sa conception, et un emplacement dont la cible
 n'est pas disponible suit §5.7.
 
+Les deux emplacements ne portent pas forcément le même état, et la rangée doit l'admettre :
+l'un peut être stable quand l'autre est en préversion. Le cas n'est pas accidentel — un
+paquet ne peut pas se déclarer stable tant qu'il dépend d'une préversion, et celui qui
+embarque ses dépendances n'a pas cette contrainte. Une rangée qui n'offrirait qu'une seule
+forme de commande en rendrait donc une fausse, et §5.7 ne porte pas que sur l'absence : un
+état mal dit est aussi un état non dit.
+
 Le contenu de chaque emplacement — nom de paquet, commande, URL — vient des métadonnées
 centralisées (§2, §14.1).
 
@@ -488,13 +544,29 @@ Chaque thème a une page, et cette page **n'est pas écrite à la main**. Elle r
 - **sa mesure**, telle que le moteur la produit : les marges sur chaque plancher, les noms
   déclarés deux fois, les catégories que personne ne porte, l'écart entre le mot le plus
   rare et le plus commun, la taille de son espace combinatoire ;
-- ce qu'il doit à d'autres, quand il le doit : deux des thèmes livrés reprennent le
+- ce qu'il doit à d'autres, quand il le doit : certains thèmes livrés reprennent le
   vocabulaire de générateurs existants, sous leur licence, et la page le dit. §11.1 explique
-  pourquoi ce n'est pas une note de bas de page.
+  pourquoi ce n'est pas une note de bas de page ;
+- **ce que le thème dit de lui-même**, quand il le dit : un thème peut déclarer un intitulé
+  d'affichage, une description, un auteur, une origine et des dates. Le moteur ne consulte
+  jamais ce bloc — il existe pour qui distribue ou reprend un thème, et une page de catalogue
+  est exactement ce lecteur-là. C'est la source de la prose de cette page, et la seule : le
+  site ne décrit jamais un thème à sa place.
 
-Cette page est le meilleur argument du produit, parce qu'elle n'argumente pas : elle
-montre un thème mesuré par l'outil qu'elle vend, avec des chiffres que personne n'a
-choisis.
+Deux conséquences, et les deux sont des pièges.
+
+**L'intitulé d'affichage n'est jamais une identité.** Un thème est identifié par son nom de
+fichier, et c'est ce nom qui est la clé de la route `{theme}`. Indexer sur l'intitulé
+recréerait la seconde source de vérité que la bibliothèque a écartée exprès, et un thème
+renommé d'un côté sans l'autre casserait des liens que rien ne vérifie.
+
+**Tout y est optionnel, le bloc compris.** Un thème qui ne dit rien de lui-même a une page
+qui ne dit rien de lui — pas une page avec une description inventée, et pas un blanc qui
+laisse croire à un défaut d'affichage. C'est §5.7 appliqué à de la prose.
+
+Cette page est le meilleur argument du produit, parce qu'elle n'argumente pas : elle montre
+un thème mesuré par l'outil qu'elle vend, avec des chiffres que personne n'a choisis — et,
+quand le thème est passé par le protocole de §3.7, elle le dit.
 
 ---
 
@@ -714,7 +786,18 @@ CLI exécute :
   catégories que personne ne porte, écart d'exposition entre les mots. Elle fonctionne sur
   un thème refusé, ce qui est le cas qui compte ;
 - de quoi **tirer immédiatement** avec son thème, y compris en levant les planchers pour
-  un fichier en cours d'écriture.
+  un fichier en cours d'écriture ;
+- le **contrôle mécanique** du protocole de §3.7 : redécomposer chaque slug tiré en ses
+  termes et vérifier chacun contre les exclusions que le thème déclare. C'est un filtre et
+  non une lecture, et un navigateur le passe sur des milliers de tirages sans se fatiguer —
+  là où son auteur, lui, se fatigue.
+
+Ce dernier point porte une limite qu'il faut écrire plutôt que laisser deviner : **le
+playground ne valide pas le sens d'un thème, et ne le prétend jamais.** Les phases du
+protocole qui trouvent le plus sont des lectures humaines, et aucune ne s'automatise. Un
+bandeau vert après le contrôle mécanique dirait à un auteur que son thème est bon là où il
+dit seulement que le fichier est cohérent avec ce qu'il déclare — exactement le malentendu
+que le protocole existe pour dissiper.
 
 Le second usage est ce que §4 appelle le public le mieux servi. Il retire à l'auteur de
 thème la seule étape qui l'obligeait à installer quelque chose avant de savoir si son
@@ -770,6 +853,11 @@ Ce qui reste vrai malgré tout : **les options que le playground offre et celles
 accepte sont la même liste.** Une option ajoutée à la ligne de commande et oubliée ici n'est
 pas une erreur de compilation, c'est un playground silencieusement en retard. C'est le seul
 endroit où la dérive reste possible, et §16 porte le contrôle qui la ferme.
+
+Le risque n'est pas théorique, et il valait d'être mesuré avant d'être cru : la ligne de
+commande a gagné des options dans les semaines qui ont suivi la rédaction de cette section.
+Le contrôle qui compare les deux listes est donc une condition de publication de la route,
+pas une amélioration ultérieure.
 
 ### 10.6 Le thème du visiteur ne quitte jamais son navigateur
 
@@ -1054,6 +1142,12 @@ thème est une liste de mots, et une liste de mots assez grande pour passer les 
 n'est pas petite. Le playground n'a donc pas à embarquer tout le catalogue pour démarrer, et
 ce qui n'est pas requis pour le premier tirage est chargé à la demande.
 
+Deux propriétés du catalogue rendent cette règle structurante plutôt que prudente : il
+**grandit**, puisque rien ne limite le nombre de thèmes qu'un dépôt peut transporter, et il
+est **inégal**, un thème pouvant peser plusieurs fois ce que pèse son voisin. Un budget
+mesuré sur la somme du catalogue serait donc faux dans les deux sens. Ce qui est budgété est
+le premier tirage, et le coût marginal d'un thème de plus.
+
 Ce qui n'est pas négociable, c'est qu'un budget chiffré existe et soit mesuré à chaque
 build : sans cela, le poids d'une application WebAssembly ne fait que croître.
 
@@ -1232,6 +1326,11 @@ transformés en contrôles ; il est aussi la liste de ce qu'on saura *ne pas* av
 | Les options du playground et celles du CLI sont la même liste | 10.5 | Confrontation en intégration continue à la déclaration de la ligne de commande |
 | Le site ne porte aucune seconde formulation d'un refus ou d'une mesure | 10.4 | Vérification des chaînes : aucune ne reproduit un message du moteur |
 | Une commande copiable proposée pour ce qui n'est pas installable | 5.7 | Échec de build |
+| Une commande d'installation qui tait la préversion d'un paquet qui en est une | 5.7, 7.4 | Échec de build |
+| La route d'un thème est indexée sur son nom de fichier, jamais sur son intitulé | 7.6 | Vérification de l'artefact |
+| Aucune description de thème que le thème ne déclare pas | 7.6, 14.2 | Génération au build ; une clé absente laisse la page muette |
+| Le playground ne présente aucun contrôle comme une validation du sens | 10.2 | Vérification des chaînes |
+| Aucun mot employé hors du vocabulaire de la bibliothèque | 5.9 | Vérification des chaînes, contre la surface publique |
 | Un composant présenté comme disponible sans version résoluble | 5.7 | Échec de build |
 | Une chaîne affichée écrite en dur dans un composant | 6.2 | Échec de build |
 | Un second dessin sur une page, ou un dessin qu'un texte touche | 5.8 | Test de navigateur, sur les pixels peints |
