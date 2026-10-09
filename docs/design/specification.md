@@ -349,6 +349,11 @@ son nom est construit autour de ce sport. La figure a donc le même statut que l
 de crash-test sur justdummies.io : elle est la chose que le nom nomme, ce qui l'autorise à
 revenir d'une page à l'autre sans contredire §5.2.
 
+Depuis que §8.1 fait du baseball le thème du site et non un clin d'œil posé dessus, la
+figure n'est pas le seul frappeur : **le terrain vide appartient à la même famille et prend
+les mêmes modalités** (§8.7). Ce qui ne change pas, c'est qu'il n'y en a qu'un par page — un
+frappeur et un terrain sur un même écran font deux dessins, pas un thème.
+
 Les modalités sont celles qui gardent cette réponse vraie :
 
 - **un seul par page.** Deux dessins sur un même écran, et la page parle d'eux ;
@@ -618,21 +623,57 @@ quand le thème est passé par le protocole de §3.7, elle le dit.
 
 ### 8.1 Positionnement
 
-Outil développeur précis : sobriété, confiance, lisibilité, une personnalité qui assume le
-clin d'œil du nom sans verser dans le pastiche sportif. L'inspiration peut emprunter la
+Outil développeur précis : sobriété, confiance, lisibilité. L'inspiration peut emprunter la
 précision d'un outil comme Linear et les conventions visuelles d'un éditeur de code
 moderne — sans copier aucun site existant.
 
-Le produit est un outil de nommage : ce que le site doit dégager est le soin qu'on met à
-choisir un mot, pas l'énergie d'un stade.
+**Le baseball est le thème du site**, et non un clin d'œil posé dessus. L'outil porte le nom
+d'un frappeur, son thème embarqué est construit autour de ce sport, et une direction
+graphique qui l'ignorerait laisserait le site ressembler à tous les autres outils
+développeur.
+
+Reste à dire **lequel** des deux baseballs, parce que c'est cette phrase-là qui rendra
+décidable tout le reste. Le sport a deux registres visuels, et ils n'ont rien en commun :
+
+- **le spectacle** — le stade, les gradins, la foule, le geste, la lumière du soir ;
+- **la notation** — la feuille de marque, le box score, le losange comme schéma, le code
+  terse d'un passage au bâton.
+
+**Le site prend la notation, et jamais le spectacle.** C'est ce que veut dire « sobre » ici,
+et c'est aussi ce qui tient : le baseball est le sport de l'écriture, et une feuille de
+marque est une grille monospace réglée à la main où chaque fait est noté en abrégé. Le
+produit est un outil de nommage dont la page de thème (§7.6) est déjà, de fait, un box
+score. Le registre n'est donc pas un emballage apposé sur le contenu : c'est la forme que le
+contenu a de lui-même.
+
+Ce que le site doit dégager est le soin qu'on met à choisir un mot et à noter ce qu'il
+produit, **pas l'énergie d'un stade.** La phrase survit à la décision et devient le test :
+devant un choix graphique, demander s'il appartient à la feuille de marque ou à la tribune.
+
+§8.7 en tire la liste de ce qui s'emprunte et de ce qui ne s'emprunte jamais.
 
 ### 8.2 Palette
 
-Fond sombre presque noir, légèrement chaud. Surfaces graphite. Texte blanc cassé. Une
-couleur d'accent vive et distinctive pour le slug produit, qui est le point focal de
-presque tous les écrans. Une couleur secondaire pour les mots du thème. Le vert réservé à
-ce qui passe une règle, un corail ou rouge doux réservé aux refus, un ton neutre dédié aux
-marqueurs d'état de §5.7 — distinct de l'accent comme de l'erreur.
+Fond sombre presque noir, franchement chaud. **Surfaces cuir et terre battue** plutôt que
+graphite : ce sont les matières du registre de §8.1, et ce sont les seules couleurs que le
+site emprunte au sport. Texte blanc cassé, avec le crème d'une feuille de marque pour les
+filets et les séparateurs. Une couleur d'accent vive et distinctive pour le slug produit,
+qui est le point focal de presque tous les écrans. Une couleur secondaire pour les mots du
+thème. Le vert réservé à ce qui passe une règle, un corail ou rouge doux réservé aux refus,
+un ton neutre dédié aux marqueurs d'état de §5.7 — distinct de l'accent comme de l'erreur.
+
+Passer au chaud déplace deux risques, et les nommer ici est ce qui évite de les découvrir
+sur la maquette :
+
+- **le corail des refus sur une surface terre battue.** Deux chaleurs voisines, et le refus
+  cesse de se détacher au moment où il compte le plus. Le corail s'écarte donc du brun par
+  la saturation et la clarté, pas par la seule teinte — et §13.4 interdisait déjà que la
+  couleur porte seule l'information ;
+- **le vert n'est pas une couleur de marque.** Le réflexe, sur un thème baseball, est de
+  prendre le vert du gazon comme couleur d'ambiance. Il est réservé, et la réserve est
+  fonctionnelle : c'est lui qui dit qu'un thème passe ses planchers, sur l'écran le plus
+  important du site (§7.6). Un gazon en fond de page lui retire son sens. Le site a donc du
+  cuir et de la terre, et **pas de gazon**.
 
 Un besoin propre à ce produit : **le pool d'un nom se dessine.** Montrer qu'un adjectif est
 atteignable et qu'un autre ne l'est pas demande deux traitements visuels qui ne sont ni une
@@ -647,6 +688,11 @@ faits que le code possède.
 Une sans-serif lisible et expressive, une monospace hautement lisible pour le code, le
 terminal et les slugs. Titres courts et généreux. Peu de capitales. Tailles fluides entre
 mobile et desktop.
+
+La monospace porte **plus de poids que l'usage ne le demanderait**, parce qu'une feuille de
+marque s'écrit dans une grille (§8.1) : elle ne sert pas seulement le code et le terminal,
+mais aussi les mesures, les marges sur les planchers et les mots d'un thème alignés en
+colonnes. C'est elle qui porte le registre ; la sans-serif porte la prose.
 
 La monospace porte ici une exigence supplémentaire : un thème peut contenir des mots
 accentués, et le moteur offre de plier les accents ou de forcer l'ASCII sans y être obligé.
@@ -699,6 +745,48 @@ Deux conséquences, et la seconde est celle par laquelle la règle lâchera :
 
 §8.2 dit déjà que les valeurs exactes n'appartiennent pas à ce document. §8.6 ajoute
 qu'elles n'appartiennent pas non plus à deux endroits.
+
+### 8.7 Ce que le site emprunte au baseball, et ce qu'il n'emprunte jamais
+
+§8.1 décide le registre ; cette liste le rend applicable sans rouvrir la discussion à chaque
+cas. Elle ne fixe pas de valeurs — §1.4 les laisse aux tokens et aux composants — elle dit
+de quel côté de la ligne une idée tombe.
+
+**Emprunté.**
+
+- **La feuille de marque comme langage de surface** : filets fins et crème plutôt que
+  bordures grises, grilles assumées, colonnes alignées. Sur la page d'un thème, le tableau de
+  mesure **est** le héros de la page et non un encadré en bas de celle-ci (§7.6).
+- **Le losange comme schéma**, là où il explique quelque chose. Un slug est une épithète, un
+  nom, un jeton — ce sont des étapes, et les dessiner comme des bases enseigne §3.3 au lieu
+  de le décorer. Un tirage qui saute le participe parcourt une base de moins. §5.3 exige
+  qu'une forme réponde à une question ; celle-ci répond à « de quoi un slug est-il fait ».
+- **Le losange comme marqueur de liste**, parce qu'un carré tourné reste lisible à la taille
+  d'une puce et que, plein ou vide, il veut dire quelque chose sur une feuille de marque.
+- **Les matières** : cuir, terre battue, crème (§8.2).
+- **Le terrain lui-même, une fois et vide.** Il relève de §5.8 comme figure de la maison :
+  seulement là où la page n'a rien à montrer — une 404, une marge que la mise en page laisse
+  vide — un seul par page, derrière, et absent plutôt que rétréci. Sans joueurs : un terrain
+  peuplé est une scène, et une scène est du spectacle.
+
+**Jamais emprunté.**
+
+- **Le stade en fond de page.** C'est le spectacle, c'est sur tous les écrans y compris ceux
+  qui démontrent, et §5.8 l'exclut déjà pour cette raison. Il coûterait par ailleurs le
+  contraste (du texte sur des gradins est un échec d'accessibilité banal, et un voile assez
+  opaque pour lire rend l'image inutile) et un budget d'image par page (§13.3).
+- **Le gazon comme couleur d'ambiance** (§8.2).
+- **La balle comme ornement** — en puce, en séparateur, en pastille. À taille de marqueur,
+  une sphère à coutures est un point gris bruité, et §8.5 exige déjà un symbole lisible à
+  16 px. La balle n'apparaît que si elle est la figure de §5.8, pas comme motif répété.
+- **Le vocabulaire de commentateur** : aucun « home run », aucun « grand chelem », aucune
+  métaphore de match dans les titres. Le thème est visuel et structurel ; la prose reste
+  celle de §11.7 — factuelle, une idée par phrase, rien de décoratif.
+- **Les marques réelles** : aucune équipe, aucun logo, aucun maillot, aucune typographie de
+  club. Ce sont des marques de tiers, et le site n'en a pas l'usage.
+
+Le test de §8.1 tranche les cas que cette liste n'a pas prévus : **cette idée appartient-elle
+à la feuille de marque, ou à la tribune ?**
 
 ---
 
@@ -1412,6 +1500,7 @@ transformés en contrôles ; il est aussi la liste de ce qu'on saura *ne pas* av
 | Aucun mot employé hors du vocabulaire de la bibliothèque | 5.9 | Vérification des chaînes, contre la surface publique |
 | Aucune métrique de qualité affichée | 5.10 | Vérification des chaînes |
 | Un littéral de couleur, d'espace ou de graisse hors de la source visuelle | 8.6 | Échec de build, des deux côtés |
+| Le vert employé ailleurs que pour ce qui passe une règle | 8.2 | Échec de build : le token est lié à ce seul rôle |
 | Un composant présenté comme disponible sans version résoluble | 5.7 | Échec de build |
 | Une chaîne affichée écrite en dur dans un composant | 6.2 | Échec de build |
 | Un second dessin sur une page, ou un dessin qu'un texte touche | 5.8 | Test de navigateur, sur les pixels peints |
