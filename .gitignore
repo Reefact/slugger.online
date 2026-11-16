@@ -4,6 +4,7 @@ dist/
 # Generated: build-time slugs and the version stamp. Both descend from a source by a
 # mechanism (specification §2), so neither is committed.
 apps/site/src/generated/
+tools/catalogue/mirrored/
 apps/site/public/version.json
 
 node_modules/

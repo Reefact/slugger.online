@@ -260,3 +260,125 @@ section + section {
     font-size: var(--text-sm);
     color: var(--ink-faint);
 }
+
+/*
+ * THE THEME CATALOGUE — §7.6.
+ *
+ * The scorecard is implemented here rather than described: ruled lines, an assumed grid, and
+ * a measurement table that is the hero of a theme's page rather than a footnote on it (§8.7).
+ */
+
+.grid {
+    display: grid;
+    gap: var(--space-4);
+    grid-template-columns: repeat(auto-fill, minmax(min(100%, 18rem), 1fr));
+    margin-top: var(--space-6);
+}
+
+.theme-card h3 {
+    margin: 0;
+}
+
+.theme-card h3 a {
+    text-decoration: none;
+}
+
+.theme-card h3 a:hover {
+    text-decoration: underline;
+    text-decoration-color: var(--slug);
+}
+
+.theme-card .slot-name {
+    margin-top: var(--space-1);
+}
+
+.theme-card .prose,
+.theme-card .state {
+    margin-block: var(--space-3);
+}
+
+.samples > li,
+.samples-wide > li {
+    margin-block: var(--space-1);
+}
+
+.samples code,
+.samples-wide code {
+    color: var(--word);
+    font-size: var(--text-sm);
+}
+
+.samples-wide code {
+    font-size: var(--text-base);
+    color: var(--slug);
+}
+
+/* The box score. Ruled in cream, monospaced, columns aligned — a scorekeeper's card. */
+.score {
+    width: 100%;
+    margin-block: var(--space-6);
+    border-collapse: collapse;
+    font-family: var(--font-mono);
+    font-size: var(--text-sm);
+    /* A narrow screen scrolls this one region rather than the page (§13.4). */
+    display: block;
+    overflow-x: auto;
+}
+
+.score th,
+.score td {
+    padding: var(--space-2) var(--space-3);
+    border-bottom: 1px solid var(--rule);
+    text-align: left;
+    white-space: nowrap;
+}
+
+.score thead th {
+    border-bottom-color: var(--rule-strong);
+    color: var(--ink-faint);
+    font-size: var(--text-xs);
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    font-weight: var(--weight-medium);
+}
+
+.score tbody th {
+    font-weight: var(--weight-normal);
+    color: var(--ink);
+}
+
+.score .beside {
+    color: var(--ink-faint);
+}
+
+/*
+ * The two reserved colours, used for the one thing each means (§8.2). Both always travel
+ * with words or a sign — §13.4 forbids either being the only thing that says it.
+ */
+.passes {
+    color: var(--passes);
+}
+
+.refused {
+    color: var(--refused);
+}
+
+.facts {
+    display: grid;
+    gap: var(--space-4);
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 16rem), 1fr));
+    margin-block: var(--space-6);
+}
+
+.facts dt {
+    font-size: var(--text-xs);
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--ink-faint);
+}
+
+.facts dd {
+    margin: var(--space-1) 0 0;
+    color: var(--ink);
+    overflow-wrap: anywhere;
+}

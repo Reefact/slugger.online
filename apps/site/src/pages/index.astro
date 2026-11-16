@@ -1,12 +1,12 @@
 ---
 import Base from '../layouts/Base.astro';
 import { packages, stateWording } from '../metadata';
-import samples from '../generated/slugs.json';
+import { themes } from '../catalogue';
 
 // Every slug on this page was drawn at build time by the real engine, from a fixed seed —
 // §14.3. None is typed. If a theme stops producing one, the build fails rather than the
 // page showing something the tool does not produce.
-const [hero, ...rest] = samples.samples;
+const [hero, ...rest] = themes.themes;
 ---
 
 <Base
@@ -16,7 +16,7 @@ const [hero, ...rest] = samples.samples;
 >
     <section class="shell">
         <p class="slot-name">Drawn by the engine, at build time</p>
-        <p class="slug">{hero.slug}</p>
+        <p class="slug">{hero.samples[0]}</p>
         <h1>You bring the words. slugger never draws a pair you didn&rsquo;t allow.</h1>
         <div class="prose">
             <p>
@@ -34,20 +34,21 @@ const [hero, ...rest] = samples.samples;
     </section>
 
     <section class="shell">
-        <h2>Three themes ship with it</h2>
+        <h2>A vocabulary you choose</h2>
         <ul class="marks">
             {
-                rest.map((sample) => (
+                rest.slice(0, 5).map((theme) => (
                     <li>
-                        <code class="mono">{sample.slug}</code>
-                        <span class="slot-name"> &mdash; {sample.theme}</span>
+                        <code class="mono">{theme.samples[0]}</code>
+                        <span class="slot-name"> &mdash; {theme.name}</span>
                     </li>
                 ))
             }
         </ul>
         <p class="prose">
             A theme is a JSON file: drop it in a directory and it is available, no code and no
-            recompiling.
+            recompiling. <a href="/themes/">Every theme slugger ships or carries</a> is measured
+            by the engine itself.
         </p>
     </section>
 

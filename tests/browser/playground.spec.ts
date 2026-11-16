@@ -79,3 +79,56 @@ test('nothing is wider than the viewport at phone width', async ({ page }) => {
         expect(overflow, `${path} scrolls horizontally`).toBeLessThanOrEqual(1);
     }
 });
+
+/**
+ * THE THEME CATALOGUE — §7.6.
+ *
+ * These pages are static, so most of what they must satisfy is readable from the artefact
+ * and lives in verify-output.sh. What only a rendered page can say is below.
+ */
+test('the catalogue lists themes, and every card leads to its page', async ({ page }) => {
+    await page.goto('/themes/');
+
+    const cards = page.locator('.theme-card');
+    await expect(cards).not.toHaveCount(0);
+
+    // Grouped by what a theme asks of its reader, not by where its file lives.
+    await expect(page.getByRole('heading', { name: 'Ready to use' })).toBeVisible();
+    await expect(page.getByRole('heading', { name: 'Registered first' })).toBeVisible();
+
+    const links = await page.locator('.theme-card h3 a').evaluateAll((as) =>
+        as.map((a) => (a as HTMLAnchorElement).getAttribute('href') ?? ''),
+    );
+
+    expect(links.length).toBeGreaterThan(0);
+
+    // Every card's target really exists. A catalogue page that linked to a 404 would be the
+    // one place the site promises something it does not have.
+    for (const href of links) {
+        const response = await page.request.get(href);
+        expect(response.status(), `${href} is not served`).toBe(200);
+    }
+});
+
+test("a theme's page is keyed on its file name and shows the engine's own figures", async ({ page }) => {
+    // The file name, deliberately, while the page's heading shows the declared title —
+    // §7.6's first trap. If the route were keyed on the title this address would 404.
+    await page.goto('/themes/jazz/');
+
+    await expect(page.locator('.score')).toBeVisible();
+
+    // One row per rule the engine applied, each with a worst case, a floor and a margin.
+    const rows = page.locator('.score tbody tr');
+    await expect(rows).not.toHaveCount(0);
+
+    const firstRow = rows.first();
+    await expect(firstRow.locator('td')).toHaveCount(3);
+
+    // The margin's sign is written out, so the colour is never the only thing saying it
+    // (§13.4) — and it is ADJACENT to its number. "+ 4,506" reads as two things; the sign
+    // belongs to the figure.
+    await expect(page.locator('.score tbody td').last()).toHaveText(/^\s*[+-][0-9]/);
+
+    // Samples drawn at build time by the engine, in the theme's own style.
+    await expect(page.locator('.samples-wide li')).not.toHaveCount(0);
+});

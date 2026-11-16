@@ -1,0 +1,35 @@
+---
+import type { Theme } from '../catalogue';
+
+interface Props {
+    theme: Theme;
+}
+
+const { theme } = Astro.props;
+
+// The display title when the theme declares one, the file name otherwise — and the file name
+// is what the link uses either way (§7.6).
+const heading = theme.meta.title ?? theme.name;
+---
+
+<article class="card theme-card">
+    <h3>
+        <a href={`/themes/${theme.name}/`}>{heading}</a>
+    </h3>
+    <p class="slot-name">{theme.name}</p>
+
+    {
+        theme.meta.description ? (
+            <p class="prose">{theme.meta.description}</p>
+        ) : (
+            /* §5.7 and §7.6: a theme that says nothing about itself gets a page that says
+               nothing about it — not an invented description, and not a blank that reads as
+               a display fault. */
+            <p class="state">This theme declares no description.</p>
+        )
+    }
+
+    <ul class="marks marks--open samples">
+        {theme.samples.slice(0, 3).map((slug) => <li><code class="mono">{slug}</code></li>)}
+    </ul>
+</article>

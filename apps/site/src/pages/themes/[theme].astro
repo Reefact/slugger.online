@@ -1,0 +1,199 @@
+---
+import Base from '../../layouts/Base.astro';
+import { ruleLabel, themes } from '../../catalogue';
+
+// One page per theme, keyed on the FILE NAME. Never on the display title a theme may
+// declare: that would recreate the second source of truth the library dropped on purpose,
+// and a theme renamed on one side would break links nothing checks (§7.6).
+export function getStaticPaths() {
+    return themes.themes.map((theme) => ({ params: { theme: theme.name }, props: { theme } }));
+}
+
+const { theme } = Astro.props;
+const m = theme.measurements;
+
+const heading = theme.meta.title ?? theme.name;
+const registered = theme.origin === 'mirrored';
+---
+
+<Base
+    title={`${heading} — slugger themes`}
+    description={theme.meta.description ?? `The ${theme.name} theme, measured by the slugger engine.`}
+>
+    <section class="shell">
+        <p class="slot-name">{registered ? 'Register it first' : 'Ready to use'}</p>
+        <h1>{heading}</h1>
+        <p class="slot-name mono">{theme.name}</p>
+
+        {
+            theme.meta.description ? (
+                <p class="prose">{theme.meta.description}</p>
+            ) : (
+                <p class="state">This theme declares no description.</p>
+            )
+        }
+    </section>
+
+    <section class="shell">
+        <h2>What it draws</h2>
+        <!-- Drawn at build time by the engine, in the theme's own style (§14.3). -->
+        <ul class="marks samples-wide">
+            {theme.samples.map((slug) => <li><code class="mono">{slug}</code></li>)}
+        </ul>
+    </section>
+
+    <!--
+      THE BOX SCORE. One line per rule, exactly the table the command's report prints, and
+      the hero of this page rather than a footnote on it (§7.6, §8.7). Every number came
+      from the engine (§14.2).
+    -->
+    <section class="shell">
+        <h2>Measured</h2>
+
+        {
+            m.isAccepted ? (
+                <p class="passes">Accepted — this theme clears every rule the engine applies.</p>
+            ) : (
+                <p class="refused">
+                    Refused for {m.refusals.length}{' '}
+                    {m.refusals.length === 1 ? 'reason' : 'reasons'}.
+                </p>
+            )
+        }
+
+        <table class="score">
+            <thead>
+                <tr>
+                    <th scope="col">Rule</th>
+                    <th scope="col">Worst case</th>
+                    <th scope="col">Floor</th>
+                    <th scope="col">Margin</th>
+                </tr>
+            </thead>
+            <tbody>
+                {
+                    m.margins.map((margin) => (
+                        <tr>
+                            <th scope="row">{ruleLabel(margin.rule)}</th>
+                            <td>
+                                {margin.worstCase.toLocaleString('en')}
+                                {margin.beside ? <span class="beside"> {margin.beside}</span> : null}
+                            </td>
+                            <td>{margin.limit.toLocaleString('en')}</td>
+                            {/* The sign carries meaning, so it is written out: §13.4 forbids
+                                colour being the only thing that says it. Composed in one
+                                expression, because two would let the template put a space
+                                between the sign and its number. */}
+                            <td class={margin.marginValue < 0 ? 'refused' : 'passes'}>
+                                {`${margin.marginValue >= 0 ? '+' : ''}${margin.marginValue.toLocaleString('en')}`}
+                            </td>
+                        </tr>
+                    ))
+                }
+            </tbody>
+        </table>
+
+        <dl class="facts">
+            <div>
+                <dt>Distinct names</dt>
+                <dd class="mono">{m.combinations.toLocaleString('en')}</dd>
+            </div>
+            <div>
+                <dt>Longest name it can draw</dt>
+                <dd class="mono">{m.longestSlug}</dd>
+            </div>
+            <div>
+                <dt>Least exposed word</dt>
+                <dd class="mono">
+                    {m.leastExposed.word} &mdash; reaches {m.leastExposed.nouns.toLocaleString('en')}
+                </dd>
+            </div>
+            <div>
+                <dt>Most exposed word</dt>
+                <dd class="mono">
+                    {m.mostExposed.word} &mdash; reaches {m.mostExposed.nouns.toLocaleString('en')}
+                </dd>
+            </div>
+        </dl>
+
+        {
+            m.remarks.length > 0 && (
+                <>
+                    <h3>Worth knowing</h3>
+                    {/* The engine's own sentences, word for word. This page orders and lists
+                        them; it never writes a second wording (§10.4). */}
+                    <ul class="marks marks--open">
+                        {m.remarks.map((remark) => <li>{remark}</li>)}
+                    </ul>
+                </>
+            )
+        }
+
+        {
+            m.refusals.length > 0 && (
+                <>
+                    <h3>Why it is refused</h3>
+                    <ul class="marks marks--open">
+                        {m.refusals.map((reason) => (
+                            <li>
+                                {reason.sentence}
+                                <span class="slot-name"> {reason.code}</span>
+                            </li>
+                        ))}
+                    </ul>
+                </>
+            )
+        }
+    </section>
+
+    <section class="shell ruled">
+        <h2>Where it comes from</h2>
+        <dl class="facts">
+            {theme.meta.author && (
+                <div>
+                    <dt>Written by</dt>
+                    <dd>{theme.meta.author}</dd>
+                </div>
+            )}
+            {theme.meta.version && (
+                <div>
+                    <dt>Version</dt>
+                    <dd class="mono">{theme.meta.version}</dd>
+                </div>
+            )}
+            {theme.meta.createdAt && (
+                <div>
+                    <dt>First written</dt>
+                    <dd class="mono">{theme.meta.createdAt}</dd>
+                </div>
+            )}
+            {theme.meta.publishedAt && (
+                <div>
+                    <dt>This version published</dt>
+                    <dd class="mono">{theme.meta.publishedAt}</dd>
+                </div>
+            )}
+            {theme.meta.source && (
+                <div>
+                    <dt>Original</dt>
+                    <dd>
+                        <a href={theme.meta.source} rel="noopener">
+                            the file it was copied from
+                            <span class="visually-hidden"> (opens in a new tab)</span>
+                        </a>
+                    </dd>
+                </div>
+            )}
+        </dl>
+
+        <p class="state">
+            {
+                registered
+                    ? `Mirrored from the library at ${themes.pinnedTag}.`
+                    : 'Carried inside the engine — nothing to register.'
+            }
+        </p>
+
+        <p><a href="/themes/">All themes</a></p>
+    </section>
+</Base>

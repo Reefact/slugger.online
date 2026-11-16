@@ -10,7 +10,7 @@ root="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 cd "$root"
 
 fail=0
-check() { printf '  %-58s' "$1"; }
+check() { printf '  %-70s' "$1"; }
 ok() { echo "ok"; }
 bad() { echo "FAILED"; echo "      $1" >&2; fail=1; }
 
@@ -87,11 +87,40 @@ else ok; fi
 
 # §14.3 — every slug on the site was drawn by the engine at build time. An empty sample set
 # means the generator ran and produced nothing, which must not ship.
-check "the build-time slugs exist and are not empty (§14.3)"
-samples="apps/site/src/generated/slugs.json"
-if [[ -s $samples ]] && grep -q '"slug"' "$samples"; then ok; else
-    bad "$samples carries no slug — the engine produced none"
+catalogue="apps/site/src/generated/catalogue.json"
+
+check "the build-time catalogue exists and carries slugs (§14.3)"
+if [[ -s $catalogue ]] && grep -q '"samples"' "$catalogue"; then ok; else
+    bad "$catalogue carries no sample — the engine produced none"
 fi
+
+# §7.6 — ONE PAGE PER THEME, AND THE ROUTE IS KEYED ON THE FILE NAME. Keying on the display
+# title would recreate the second source of truth the library dropped on purpose, and a
+# theme renamed on one side would break links nothing checks. Read from the artefact: every
+# name in the catalogue must have a directory, and the count must match.
+check "every theme in the catalogue has a page, keyed on its file name (§7.6)"
+if [[ -s $catalogue ]]; then
+    missing=""
+    count=0
+    while IFS= read -r name; do
+        count=$(( count + 1 ))
+        [[ -f "dist/themes/${name}/index.html" ]] || missing="${missing}${name} "
+    done < <(grep -oE '"name": "[^"]+"' "$catalogue" | sed 's/"name": "//; s/"$//')
+    pages=$(find dist/themes -mindepth 1 -maxdepth 1 -type d 2>/dev/null | wc -l)
+    if [[ -n $missing ]]; then
+        bad "no page for: $missing"
+    elif [[ $pages -ne $count ]]; then
+        bad "$count themes in the catalogue, $pages pages in dist/themes"
+    else ok; fi
+else bad "no catalogue to check against"; fi
+
+# §14.2 — NO FIGURE ABOUT A THEME IS EVER WRITTEN BY HAND. These change with every word an
+# author adds, by somebody with no reason to think about a website; a copied one is wrong
+# before it is reread. The catalogue pages must carry no numeric literal of their own.
+check "no theme figure typed into a page (§14.2)"
+typed="$(grep -nE '>[[:space:]]*[0-9][0-9,.]{2,}[[:space:]]*<' \
+    apps/site/src/pages/themes apps/site/src/components/ThemeCard.astro -r 2>/dev/null || true)"
+if [[ -z $typed ]]; then ok; else bad "$typed"; fi
 
 # §8.6 — one visual source. The playground is the side that will break this, so the check
 # looks there first: the token file must have crossed, and no component may carry a literal.

@@ -1,0 +1,9 @@
+# The library release this site mirrors its repository themes from — §7.5.
+#
+# ATOMIC AND PINNED TO A PUBLISHED RELEASE TAG, so the themes a reader can register and the
+# command the site offers to install are two statements about the same artefact. The command
+# is what registers a theme, so the pin follows the command's train, not the engine's.
+#
+# Raising it is the whole of an upgrade: scripts/fetch-themes.sh reads this file, and nothing
+# else names a tag.
+cli-v1.2.1

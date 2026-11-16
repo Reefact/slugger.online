@@ -1,0 +1,59 @@
+---
+import Base from '../../layouts/Base.astro';
+import ThemeCard from '../../components/ThemeCard.astro';
+import { byOrigin, themes } from '../../catalogue';
+
+const embedded = byOrigin('embedded');
+const mirrored = byOrigin('mirrored');
+---
+
+<Base
+    title="Themes — slugger"
+    description="Every vocabulary slugger ships with or carries, measured by the engine itself."
+>
+    <section class="shell">
+        <h1>Themes</h1>
+        <div class="prose">
+            <p>
+                A theme is a JSON file: a list of nouns, and the adjectives and participles that
+                may stand in front of them. Each page below shows what the theme draws, and what
+                the engine measures in it — <strong>no figure here was typed</strong>, every one
+                was counted at build time.
+            </p>
+        </div>
+    </section>
+
+    <!--
+      Grouped by what a theme asks of its reader, never by where its file lives (§7.6). The
+      first group needs nothing done; the second is registered.
+    -->
+    <section class="shell">
+        <h2>Ready to use</h2>
+        <p class="prose">
+            Carried inside the engine. Ask for one by name and it works, with nothing installed
+            beyond the command itself.
+        </p>
+        <div class="grid">
+            {embedded.map((theme) => <ThemeCard theme={theme} />)}
+        </div>
+    </section>
+
+    <section class="shell">
+        <h2>Registered first</h2>
+        <p class="prose">
+            Ordinary files the library carries without embedding. Measure one, register it, and
+            it joins the list above for you.
+        </p>
+        <div class="grid">
+            {mirrored.map((theme) => <ThemeCard theme={theme} />)}
+        </div>
+    </section>
+
+    <section class="shell ruled">
+        <!-- §7.5: the snapshot is atomic and pinned, and the page says to what. -->
+        <p class="state">
+            Mirrored from the library at <code class="mono">{themes.pinnedTag}</code>, measured by
+            engine {themes.engine}.
+        </p>
+    </section>
+</Base>

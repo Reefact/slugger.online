@@ -7,9 +7,10 @@ and that refuse a vocabulary which does not hold up.
 The site is one static deployment: an Astro application, with a Blazor WebAssembly
 playground mounted under `/playground/`. There is no application server.
 
-> **Status: skeleton.** The build pipeline is real and verified end to end — the playground
-> boots in a browser and draws slugs from the published engine. The landing page's narrative,
-> the theme catalogue and the comparison page are specified and not yet built.
+> **Status: the pipeline and the theme catalogue are built.** Every theme the library ships
+> or carries has a page, measured by the engine itself, and the playground boots in a browser
+> and draws from the published package. The landing page's narrative and the comparison page
+> are specified and not yet built.
 
 ## The specification
 
@@ -30,10 +31,31 @@ apps/
 packages/
   design-tokens/ Colour, space, type and motion, shared by both applications (§8.6)
 tools/
-  sample-slugs/  Draws, at build time, every slug the site displays (§14.3)
+  catalogue/     Measures every theme and draws every slug the site shows (§7.6, §14.3)
 scripts/         Build the two halves, assemble them, and refuse a bad artefact
 docs/design/     The specification
 ```
+
+## The theme catalogue
+
+`/themes` carries one page per theme — the three the engine embeds, and the ones the library
+carries as ordinary files. Grouped by what a theme asks of its reader rather than by where
+its file lives: the first work with nothing done, the second are registered.
+
+**Not one figure on those pages was typed.** Margins on each floor, combinations, the
+exposure gap, duplicated nouns, unreachable categories: all of it is counted at build time by
+the engine, through the model `DEC0038` published. So are the slugs, drawn from a fixed seed
+in each theme's own style. A theme that stopped producing one would fail the build.
+
+The mirrored themes are pinned to a released tag, declared once in [`themes.pin`](themes.pin)
+and fetched by `scripts/fetch-themes.sh`. A tag, never a branch: mirroring `main` would
+publish a theme nobody can register yet.
+
+One thing the specification asks for is absent, deliberately — how a theme classes its words.
+The engine publishes the categories nothing reaches and no more, and the site asks for a
+measure it lacks rather than computing one
+([Reefact/slugger#122](https://github.com/Reefact/slugger/issues/122)). Parsing the theme here
+would be a second reading of a document the engine already reads.
 
 ## Requirements
 
