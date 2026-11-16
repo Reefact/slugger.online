@@ -138,14 +138,14 @@ order="$(grep -oE 'id="act-(one|two|three)"' dist/index.html | sed 's/id="act-//
 # §9.3 — every act ends with an exit, so a visitor convinced early can leave with the
 # command in hand.
 check "every act ends with an exit (§9.3)"
-exits="$(grep -o 'class="exit"' dist/index.html | wc -l)"
+exits="$(grep -o 'class="exit"' dist/index.html | wc -l || true)"
 [[ $exits -ge 3 ]] && ok || bad "$exits exits for three acts"
 
 # §13.5 — THE COMPARISON IS THE DOCUMENT, not something a script builds. Act one is never
 # downgraded (§9.7), so its rounds must be in the markup: a reader without scripting gets
 # the act, not an empty frame.
 check "act one's comparison is in the markup, not built by script (§13.5)"
-rounds="$(grep -o 'data-round' dist/index.html | wc -l)"
+rounds="$(grep -o 'data-round' dist/index.html | wc -l || true)"
 [[ $rounds -ge 10 ]] && ok || bad "only $rounds rounds in the markup"
 
 # §14.4 — the one named exception to "no published theme is refused". The narrative tool
@@ -155,6 +155,41 @@ check "the deliberately refused theme is still refused (§14.4)"
 narrative="apps/site/src/generated/narrative.json"
 if [[ -s $narrative ]] && grep -q '"refusals"' "$narrative"; then ok; else
     bad "$narrative carries no refusal — act three has nothing to read"
+fi
+
+# §13.1, §13.2 — THE RESPONSE HEADERS. The file is in the artefact; whether the host
+# applies it is something only a served response can say, and tests/browser/headers.spec.ts
+# asks that question against the runtime production uses.
+
+check "the headers file was generated (§13.1)"
+[[ -f dist/_headers ]] && ok || bad "dist/_headers missing — run generate-headers.mjs"
+
+check "_headers and _redirects are kept out of the asset store"
+if grep -q '^_headers$' dist/.assetsignore 2>/dev/null && grep -q '^_redirects$' dist/.assetsignore 2>/dev/null; then
+    ok
+else bad "dist/.assetsignore must list both, or the host serves them as files"; fi
+
+# §13.2 — the narrow allowance is permitted and documented; the broad one is FORBIDDEN.
+# Checked on the artefact as well as in a browser, because this is the line the policy
+# exists to hold and widening it is a one-word change.
+check "the policy allows WebAssembly and nothing broader (§13.2)"
+if grep -q "wasm-unsafe-eval" dist/_headers 2>/dev/null &&
+   ! grep -qE "'unsafe-eval'|'unsafe-inline'" dist/_headers; then
+    ok
+else bad "the policy is missing 'wasm-unsafe-eval', or carries a broad allowance"; fi
+
+check "the policy's hashes and the artefact's inline content agree (§13.2)"
+# The generator hashes whatever stayed inline, and the two checks further up refuse inline
+# content outright. So the only consistent artefact is one with neither — and the day
+# something genuinely has to be inlined, those checks and this one move together rather
+# than 'unsafe-inline' being added quietly, which would disable the protection for every
+# script and style on the site to save one request.
+hashed="$(grep -o 'sha256-' dist/_headers | wc -l || true)"
+inline_styles="$(grep -oE '<style[^>]*>[^<]' dist/index.html | wc -l || true)"
+if [[ $hashed -eq 0 && $inline_styles -eq 0 ]]; then
+    ok
+else
+    bad "$hashed policy hashes for $inline_styles inline blocks — they must match"
 fi
 
 # §11 — THE COMPARISON. Read off the page, because what matters is what shipped.
@@ -167,19 +202,19 @@ check "the comparison page is there (§11)"
 # would compile and publish a criterion nobody was taught.
 check "every axis carries its question in the page (§11.4)"
 if [[ -f dist/why-slugger/index.html ]]; then
-    declared="$(grep -oE "question: '" apps/site/src/comparison.ts | wc -l)"
-    rendered="$(grep -o 'class="axis-question"' dist/why-slugger/index.html | wc -l)"
+    declared="$(grep -oE "question: '" apps/site/src/comparison.ts | wc -l || true)"
+    rendered="$(grep -o 'class="axis-question"' dist/why-slugger/index.html | wc -l || true)"
     [[ $declared -gt 0 && $declared -eq $rendered ]] && ok ||
         bad "$declared axes declared, $rendered questions rendered"
 else bad "no comparison page"; fi
 
 check "every axis carries its explanation and its verdicts (§11.4)"
 if [[ -f dist/why-slugger/index.html ]]; then
-    axes="$(grep -o 'class="axis"' dist/why-slugger/index.html | wc -l)"
-    verdicts="$(grep -o 'class="verdict verdict--' dist/why-slugger/index.html | wc -l)"
+    axes="$(grep -o 'class="axis"' dist/why-slugger/index.html | wc -l || true)"
+    verdicts="$(grep -o 'class="verdict verdict--' dist/why-slugger/index.html | wc -l || true)"
     # Read off the matrix's own header rather than guessed from the source: one column per
     # option, plus the one that names the question.
-    columns="$(grep -o '<th scope="col">' dist/why-slugger/index.html | wc -l)"
+    columns="$(grep -o '<th scope="col">' dist/why-slugger/index.html | wc -l || true)"
     options=$(( columns - 1 ))
     [[ $axes -gt 0 && $verdicts -eq $(( axes * options )) ]] && ok ||
         bad "$axes axes x $options options should be $(( axes * options )) verdicts, found $verdicts"

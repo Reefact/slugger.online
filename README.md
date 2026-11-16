@@ -61,6 +61,32 @@ Act three reads a theme that is refused on purpose, which is the one exception t
 specification names. The generator fails if that file is ever *accepted*, so the exception is
 enforced from the other side rather than by lowering the rule.
 
+## The headers and the content policy
+
+`scripts/generate-headers.mjs` writes `dist/_headers` after the artefact exists, because the
+policy has to name the hash of anything that stayed inline and a hash changes whenever its
+content does. A hand-written policy is one that is right until the next build.
+
+**The playground runs under a policy with no `'unsafe-eval'` and no `'unsafe-inline'.** A
+WebAssembly runtime cannot start without permission to instantiate a module, and
+`'wasm-unsafe-eval'` is exactly that permission and nothing else — no string evaluation, no
+`Function` construction, no inline script. The runtime does carry a `new Function` call, in
+the path serving the debugging proxy; it never runs on a published site, and the browser
+check is what settles that rather than a comment.
+
+Those checks do three things no file can say: they watch for the violation event a browser
+raises when it blocks something and require none while the playground boots to a slug; they
+inject an inline script and require the browser to refuse it, so a passing boot cannot hide
+a policy that was never enforced; and they read the cache regimes off real responses.
+
+Strict transport is **opt-in** — `PUBLIC_HSTS=on` — because sending it from a deployment
+whose custom domain is not yet serving locks visitors out for the lifetime of the max-age.
+The deployment that turns it on is the one that has checked.
+
+`_headers` and `_redirects` are never served: the host parses them and applies their rules,
+and `public/.assetsignore` keeps them out of the asset store. Verified by asking for
+`/_headers` and getting a 404.
+
 ## The comparison
 
 `/why-slugger` compares slugger with a list you wrote yourself, an opaque identifier,

@@ -19,6 +19,11 @@ pnpm --filter @slugger/site build
 ./scripts/check-trim.sh
 
 ./scripts/copy-playground.sh
+
+# §13.2 — the policy names the hash of anything left inline, so it is written after the
+# artefact exists and recomputed every time.
+node ./scripts/generate-headers.mjs
+
 ./scripts/verify-output.sh
 
 echo
