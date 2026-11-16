@@ -316,6 +316,24 @@ Un thème inventé pour la vitrine est un thème que personne n'a validé, et il
 montrer une paire que l'outil ne produit pas. Le mécanisme de §14.3 rend cette règle
 vérifiable plutôt que morale.
 
+**Une quatrième source existe, et il faut la nommer parce que la narration ne peut pas s'en
+passer : le thème dérivé.** L'acte I (§9.2) oppose un vocabulaire à lui-même — une fois
+classé, une fois à plat — et la moitié plate ne s'écrit pas, elle se calcule : on prend un
+thème réel et on lui retire sa classification, rien d'autre. Aucun mot n'est ajouté, enlevé
+ni changé, donc les deux colonnes qu'un lecteur compare sont le même vocabulaire.
+
+Trois conditions en font une source légitime plutôt qu'un contournement :
+
+- **la dérivation est mécanique et publiée.** Elle vit dans le dépôt du site, elle se lit, et
+  ce qu'elle retire est énumérable. Un lecteur peut la refaire ;
+- **le dérivé passe les règles ordinaires**, sans dérogation, comme n'importe quel thème
+  publié. S'il ne les passait pas, le site comparerait à quelque chose qui ne peut pas
+  exister, et le build échoue ;
+- **ce que la dérivation ne peut pas conserver est retiré avec le reste, pas contourné.** Une
+  promesse de longueur porte sur les pools classés ; à plat, les pools grossissent et la
+  promesse ne tient plus. Elle tombe donc avec les catégories, et le dire ici évite qu'on
+  lève un plancher pour la sauver.
+
 Une seule exception, et elle est nommée en §14.4 : l'exemple **minimal** que le guide
 utilise pour montrer ce qu'un refus dit est nécessairement un thème refusé. Sa propriété
 d'être refusé est son propos.

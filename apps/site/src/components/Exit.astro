@@ -1,0 +1,44 @@
+---
+import { packages, stateWording } from '../metadata';
+
+interface Props {
+    /** What the visitor has just understood — never more (§9.3). */
+    lead: string;
+    /** Which package ids this exit offers, in order. A graded exit offers what was shown. */
+    offers: readonly string[];
+    extra?: { readonly href: string; readonly label: string };
+}
+
+const { lead, offers, extra } = Astro.props;
+const shown = packages.filter((pkg) => offers.includes(pkg.id));
+---
+
+<!--
+  §9.3 — every act ends with an exit, and the exits are GRADED. A visitor convinced at the
+  end of act one has no reason to read on, and the page has to let them leave with the
+  command in hand. An exit that offers what they have not been shown yet is noise.
+-->
+<aside class="exit" aria-label="Install">
+    <p class="prose">{lead}</p>
+    <dl class="install">
+        {
+            shown.map((pkg) => (
+                <div>
+                    <dt>
+                        {pkg.label} &middot; {pkg.id} {pkg.version}
+                    </dt>
+                    <dd>
+                        {pkg.state === 'published' ? (
+                            <code class="slot-command">{pkg.command}</code>
+                        ) : (
+                            /* §5.7: nothing copyable for what is not installable, and the
+                               state is said in words rather than implied by an absence. */
+                            <p class="state">{stateWording[pkg.state]}</p>
+                        )}
+                    </dd>
+                </div>
+            ))
+        }
+    </dl>
+    {extra && <p class="prose"><a href={extra.href}>{extra.label}</a></p>}
+</aside>

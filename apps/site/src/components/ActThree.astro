@@ -1,0 +1,118 @@
+---
+import Exit from './Exit.astro';
+import { narration } from '../narrative';
+import { ruleLabel } from '../catalogue';
+
+const act = narration.actThree;
+
+// Grouped by code, which is what the engine makes stable — the sentences are its own and are
+// shown word for word. Grouping and ordering are this page's job, never the wording (§10.4).
+const byCode = new Map<string, string[]>();
+
+for (const reason of act.refusals) {
+    byCode.set(reason.code, [...(byCode.get(reason.code) ?? []), reason.sentence]);
+}
+---
+
+<!--
+  ACT III — the theme answers for itself. §9.2, and a static block for the reason ActTwo
+  gives.
+-->
+<section class="act" id="act-three" aria-labelledby="act-three-heading">
+    <div class="shell">
+        <p class="act-mark">Act three</p>
+
+        <!--
+          §9.4 — THE HINGE IS MANDATORY, and its content is constrained. The visitor has just
+          been told the vocabulary is theirs; the next thing they see is a file being refused.
+          Without this sentence they read a bad news where they are being offered a guarantee.
+        -->
+        <p class="hinge">
+            Words of your own are a freedom, and this is what pays for it: slugger answers for
+            the vocabulary you write, so it has to be able to refuse one.
+        </p>
+
+        <h2 id="act-three-heading">A refusal that says everything at once</h2>
+
+        <div class="prose">
+            <p>
+                Here is a theme written in ten minutes and kept exactly as it was first typed.
+                One run reports <strong>every</strong> reason it cannot be used — not the first,
+                and not one per attempt.
+            </p>
+        </div>
+
+        <div class="card refusal">
+            <p class="refused">
+                Theme &ldquo;{act.theme}&rdquo; was refused for {act.refusals.length} reasons.
+            </p>
+            {
+                [...byCode].map(([code, sentences]) => (
+                    <section class="refusal-group">
+                        <p class="slot-name">{code}</p>
+                        <ul class="marks marks--open">
+                            {sentences.map((sentence) => <li>{sentence}</li>)}
+                        </ul>
+                    </section>
+                ))
+            }
+        </div>
+
+        <div class="prose">
+            <p>
+                Every reason names its subject — the noun, the category, the key — because a
+                figure on its own does not say what to fix.
+            </p>
+            <p>
+                <strong>And a refusal only answers yes or no.</strong> Measuring answers
+                <em>by how much</em>, and it works on a refused file, which is exactly when it
+                is wanted:
+            </p>
+        </div>
+
+        <table class="score">
+            <thead>
+                <tr>
+                    <th scope="col">Rule</th>
+                    <th scope="col">Worst case</th>
+                    <th scope="col">Floor</th>
+                    <th scope="col">Margin</th>
+                </tr>
+            </thead>
+            <tbody>
+                {
+                    act.margins.map((margin) => (
+                        <tr>
+                            <th scope="row">{ruleLabel(margin.rule)}</th>
+                            <td>{margin.worstCase.toLocaleString('en')}</td>
+                            <td>{margin.limit.toLocaleString('en')}</td>
+                            <td class={margin.marginValue < 0 ? 'refused' : 'passes'}>
+                                {`${margin.marginValue >= 0 ? '+' : ''}${margin.marginValue.toLocaleString('en')}`}
+                            </td>
+                        </tr>
+                    ))
+                }
+            </tbody>
+        </table>
+
+        <div class="prose">
+            <p>
+                Knowing a noun reaches six adjectives rather than ninety-nine is what tells an
+                author what to write next. A refusal would only have said it was short.
+            </p>
+            <p>
+                <!-- §9.6 — the page never promises more than the library does. -->
+                What none of this judges is taste. No rule will say an adjective is a noun badly
+                used, or that a participle lends a stone an intention it cannot have. That is
+                read, not computed — which is why a theme can exclude a word for one noun and
+                keep it for every other.
+            </p>
+        </div>
+
+        <Exit
+            lead="You have seen what writing a theme costs and what answers for it. The command is what measures and registers one."
+            offers={['Slugger']}
+            extra={{ href: '/themes/', label: 'Themes already written, measured by the engine' }}
+        />
+    </div>
+</section>

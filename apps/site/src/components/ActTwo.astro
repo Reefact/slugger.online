@@ -1,0 +1,53 @@
+---
+import Exit from './Exit.astro';
+import { narration } from '../narrative';
+
+const act = narration.actOne;
+---
+
+<!--
+  ACT II — the vocabulary is yours. §9.2.
+
+  A STATIC BLOCK, and deliberately: §9.7 budgets every animated scene four times over
+  (desktop, mobile, reduced motion, no script) and fixes the order in which that cost is
+  given back — merge two scenes, merge the hinge with what follows, then downgrade a whole
+  act. Act one is never downgraded, because it alone carries the demonstration. This is that
+  order applied rather than a corner cut.
+-->
+<section class="act" id="act-two" aria-labelledby="act-two-heading">
+    <div class="shell">
+        <p class="act-mark">Act two</p>
+        <h2 id="act-two-heading">The words are yours</h2>
+
+        <div class="prose">
+            <p>
+                A theme is a JSON file. No code, no recompiling, no plugin: a list of nouns, the
+                adjectives and participles that may stand in front of them, and the categories
+                that say which meets which.
+            </p>
+            <p>
+                <strong>It is known by its file name.</strong> Drop
+                <code class="mono">{act.theme}.json</code> in the theme directory and ask for
+                <code class="mono">{act.theme}</code>. A file named after a theme the engine
+                carries shadows it — allowed, and announced.
+            </p>
+            <p>
+                Ask for several at once and the draw is weighted across them, each theme staying
+                a sealed vocabulary: two files may use the same category name without the
+                slightest relation, because a draw never leaves one file.
+            </p>
+            <p>
+                <strong>A theme's style travels with its words.</strong> Its separator, its
+                casing, whether a suffix appears: asking for a theme asks for its format as much
+                as its vocabulary. Every name on this site is drawn in the style its own theme
+                declares.
+            </p>
+        </div>
+
+        <Exit
+            lead="You have seen the engine and the command that drives it. Both install on their own."
+            offers={['Slugger', 'Slugger.Core']}
+            extra={{ href: '/themes/', label: 'Every theme slugger ships or carries' }}
+        />
+    </div>
+</section>

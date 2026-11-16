@@ -17,6 +17,11 @@ echo "==> catalogue: measurements and slugs, from the engine"
 dotnet run --project tools/catalogue/Catalogue.csproj -c Release -- \
     tools/catalogue/mirrored "$tag" apps/site/src/generated/catalogue.json
 
+echo "==> narrative: the contrast act one argues, and the refusal act three reads"
+dotnet run --project tools/narrative/Narrative.csproj -c Release -- \
+    tools/catalogue/mirrored/iceland.json apps/site/src/themes/hasty.json "$tag" \
+    apps/site/src/generated/narrative.json
+
 echo "==> version stamp"
 mkdir -p apps/site/public
 commit="$(git rev-parse HEAD 2>/dev/null || echo unknown)"

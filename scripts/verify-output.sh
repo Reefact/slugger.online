@@ -122,6 +122,41 @@ typed="$(grep -nE '>[[:space:]]*[0-9][0-9,.]{2,}[[:space:]]*<' \
     apps/site/src/pages/themes apps/site/src/components/ThemeCard.astro -r 2>/dev/null || true)"
 if [[ -z $typed ]]; then ok; else bad "$typed"; fi
 
+# §9 — THE NARRATION. These read the home page rather than the components, because what
+# matters is what shipped.
+
+# §9.4 — the hinge of act three is MANDATORY, not decorative: without it a visitor reads a
+# bad news where a guarantee is being offered.
+check "act three opens on its hinge (§9.4)"
+grep -q 'class="hinge"' dist/index.html && ok || bad "no hinge on the home page"
+
+# §9.2 — one transformation in three acts, and in order.
+check "the three acts are present, in order (§9.2)"
+order="$(grep -oE 'id="act-(one|two|three)"' dist/index.html | sed 's/id="act-//; s/"//' | tr '\n' ' ')"
+[[ $order == "one two three " ]] && ok || bad "acts came out as: $order"
+
+# §9.3 — every act ends with an exit, so a visitor convinced early can leave with the
+# command in hand.
+check "every act ends with an exit (§9.3)"
+exits="$(grep -o 'class="exit"' dist/index.html | wc -l)"
+[[ $exits -ge 3 ]] && ok || bad "$exits exits for three acts"
+
+# §13.5 — THE COMPARISON IS THE DOCUMENT, not something a script builds. Act one is never
+# downgraded (§9.7), so its rounds must be in the markup: a reader without scripting gets
+# the act, not an empty frame.
+check "act one's comparison is in the markup, not built by script (§13.5)"
+rounds="$(grep -o 'data-round' dist/index.html | wc -l)"
+[[ $rounds -ge 10 ]] && ok || bad "only $rounds rounds in the markup"
+
+# §14.4 — the one named exception to "no published theme is refused". The narrative tool
+# fails if this file is ever ACCEPTED, so the exception is enforced from the other side
+# rather than by lowering the rule.
+check "the deliberately refused theme is still refused (§14.4)"
+narrative="apps/site/src/generated/narrative.json"
+if [[ -s $narrative ]] && grep -q '"refusals"' "$narrative"; then ok; else
+    bad "$narrative carries no refusal — act three has nothing to read"
+fi
+
 # §8.6 — one visual source. The playground is the side that will break this, so the check
 # looks there first: the token file must have crossed, and no component may carry a literal.
 check "the shared tokens crossed into the playground (§8.6)"

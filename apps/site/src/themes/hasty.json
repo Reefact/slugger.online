@@ -1,0 +1,20 @@
+{
+  "meta": {
+    "title": "Hasty",
+    "description": "A theme written in ten minutes and kept exactly as it was first typed. It is refused, and that is its whole purpose: it is the file act III reads."
+  },
+  "adjectives": {
+    "common": ["old", "new", "quiet", "bright", "weathered", "still"],
+    "aquatic": ["clear", "brackish", "swift"]
+  },
+  "participles": {
+    "common": ["standing", "waiting"]
+  },
+  "nouns": [
+    { "value": "willow", "categories": ["vegetal"] },
+    { "value": "river", "categories": ["aquatic"] },
+    { "value": "pebble" },
+    { "value": "reed", "categories": ["aquatic"] }
+  ],
+  "defaults": { "sep": "-", "casing": "kebab" }
+}

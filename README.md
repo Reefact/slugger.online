@@ -7,10 +7,10 @@ and that refuse a vocabulary which does not hold up.
 The site is one static deployment: an Astro application, with a Blazor WebAssembly
 playground mounted under `/playground/`. There is no application server.
 
-> **Status: the pipeline and the theme catalogue are built.** Every theme the library ships
-> or carries has a page, measured by the engine itself, and the playground boots in a browser
-> and draws from the published package. The landing page's narrative and the comparison page
-> are specified and not yet built.
+> **Status: the pipeline, the theme catalogue and the narrative are built.** The home page
+> carries its three acts, every theme the library ships or carries has a page measured by the
+> engine, and the playground boots in a browser and draws from the published package. The
+> comparison page is specified and not yet built.
 
 ## The specification
 
@@ -32,9 +32,34 @@ packages/
   design-tokens/ Colour, space, type and motion, shared by both applications (§8.6)
 tools/
   catalogue/     Measures every theme and draws every slug the site shows (§7.6, §14.3)
+  narrative/     Derives the flat theme act one argues against, and reads act three's refusal
 scripts/         Build the two halves, assemble them, and refuse a bad artefact
 docs/design/     The specification
 ```
+
+## The narrative
+
+The home page is one transformation in three acts, and act one is the only one that has to
+convince: on a flat list the bad pair is rare and unpredictable, which is why proofreading
+cannot catch it.
+
+**That act uses no invented word.** It shows one vocabulary drawn twice, with the same seed —
+once through a theme that says which words may meet, once through the same theme with that
+classification mechanically removed. The derivation lives in `tools/narrative`, removes
+classification and nothing else, and both halves are loaded under the ordinary rules: if the
+derived theme were ever refused, the build fails rather than comparing against something that
+could not exist.
+
+One promise cannot survive the derivation and is dropped with the categories: a theme's
+length promise is a promise about its *sorted* pools, and flattening grows every pool.
+
+Acts two and three are static blocks. That is the order the specification fixes for giving
+back the cost of an animated scene — merge two scenes, merge the hinge with what follows,
+then downgrade a whole act — applied deliberately. Act one is never downgraded.
+
+Act three reads a theme that is refused on purpose, which is the one exception the
+specification names. The generator fails if that file is ever *accepted*, so the exception is
+enforced from the other side rather than by lowering the rule.
 
 ## The theme catalogue
 

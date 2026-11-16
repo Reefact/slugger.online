@@ -1,0 +1,134 @@
+---
+import Exit from './Exit.astro';
+import { narration } from '../narrative';
+
+const act = narration.actOne;
+
+// How many more pairs a flat list offers. Computed from two figures the engine produced
+// (§14.2) — the site divides them, it does not count anything.
+const times = Math.round(act.combinationsWithout / act.combinationsWithCategories);
+---
+
+<!--
+  ACT I — the absurd draw. §9.2.
+  
+  It is the only act that has to convince, and §9.7 forbids ever downgrading it to a static
+  block: two lists of words prove nothing on their own. So the comparison IS the content of
+  the DOM, in logical order, and the scroll only changes how it arrives — §13.5 is satisfied
+  by construction rather than by a second rendering.
+-->
+<section class="act" id="act-one" aria-labelledby="act-one-heading">
+    <div class="shell">
+        <p class="act-mark">Act one</p>
+        <h2 id="act-one-heading">Any word with any other</h2>
+
+        <div class="prose">
+            <p>
+                Every name generator draws its adjective from a flat list, where anything goes
+                with anything. Most draws come out fine. That is exactly the problem:
+                <strong>the bad pair is rare, and you cannot tell which draw it will be.</strong>
+            </p>
+            <p>
+                Below is one vocabulary, drawn twice. Same words, same nouns, same number of
+                draws. On the left the theme says which words may meet which; on the right that
+                is the only thing removed.
+            </p>
+        </div>
+    </div>
+
+    <div class="shell">
+        <div class="duel" data-scene>
+            <div class="duel-head">
+                <p class="duel-label duel-label--sorted">
+                    <span aria-hidden="true" class="duel-key duel-key--sorted"></span>
+                    The words know what they can describe
+                </p>
+                <p class="duel-label duel-label--flat">
+                    <span aria-hidden="true" class="duel-key duel-key--flat"></span>
+                    Nothing says which go together
+                </p>
+            </div>
+
+            <!--
+              A list, not a table: these are pairs of draws, not rows of a measurement. Each
+              round carries both halves so a reader meets them together, which is the whole
+              comparison.
+            -->
+            <ol class="duel-rounds">
+                {
+                    act.rounds.map((round) => (
+                        <li class="duel-round" data-round>
+                            <code class="mono duel-sorted">{round.withCategories}</code>
+                            <code class="mono duel-flat">{round.withoutCategories}</code>
+                        </li>
+                    ))
+                }
+            </ol>
+        </div>
+    </div>
+
+    <div class="shell">
+        <div class="prose">
+            <p>
+                A noun that declares what it is can only meet an adjective that fits.
+                <code class="mono">{act.title}</code> reaches
+                <strong>{act.combinationsWithCategories.toLocaleString('en')}</strong> names that
+                way. Flattened, it reaches
+                <strong>{act.combinationsWithout.toLocaleString('en')}</strong> —
+                {times.toLocaleString('en')} times as many, and almost all of the difference is
+                pairs nobody would want to read.
+            </p>
+            <p>
+                <strong>This is a limit, not a mistake.</strong> A flat list is a reasonable
+                choice for anyone who does not need better, and the generators built on one have
+                served for years. slugger exists for the case where it is not enough.
+            </p>
+        </div>
+
+        <Exit
+            lead="If that is the whole of what you needed, this is where you can stop reading. The engine draws from a vocabulary of your own, from C# or from a terminal."
+            offers={['Slugger.Core']}
+        />
+    </div>
+</section>
+
+<script>
+    /**
+     * The scroll only changes HOW the comparison arrives — §13.5.
+     *
+     * The rounds are already in the document, in order, and visible. This script opts the
+     * scene into a revealed-on-scroll state by adding a class; without it, or with the class
+     * never added, the page is the linear version and nothing is missing. That is why the
+     * enhancement adds the hidden state rather than removing it: a script that failed to run
+     * after hiding things would take the act with it.
+     *
+     * Under a reduced-motion preference it does nothing at all: no scrub, no staged arrival,
+     * every round present at once, and the whole of the information kept.
+     */
+    const scene = document.querySelector<HTMLElement>('[data-scene]');
+    const rounds = document.querySelectorAll<HTMLElement>('[data-round]');
+
+    const motionIsWelcome =
+        typeof window.matchMedia === 'function' &&
+        !window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+    if (scene && rounds.length > 0 && motionIsWelcome && 'IntersectionObserver' in window) {
+        scene.classList.add('duel--staged');
+
+        const observer = new IntersectionObserver(
+            (entries) => {
+                for (const entry of entries) {
+                    if (entry.isIntersecting) {
+                        entry.target.classList.add('is-in');
+                        observer.unobserve(entry.target);
+                    }
+                }
+            },
+            { rootMargin: '0px 0px -15% 0px', threshold: 0.2 },
+        );
+
+        for (const round of rounds) {
+            observer.observe(round);
+        }
+    }
+</script>
