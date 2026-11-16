@@ -1,0 +1,81 @@
+---
+import Base from '../layouts/Base.astro';
+import { packages, stateWording } from '../metadata';
+import samples from '../generated/slugs.json';
+
+// Every slug on this page was drawn at build time by the real engine, from a fixed seed —
+// §14.3. None is typed. If a theme stops producing one, the build fails rather than the
+// page showing something the tool does not produce.
+const [hero, ...rest] = samples.samples;
+---
+
+<Base
+    title="slugger — readable names from a vocabulary you own"
+    description="A .NET command and library that draw adjective-noun names from JSON themes, and refuse a vocabulary that does not hold up."
+    showHeaderInstall={false}
+>
+    <section class="shell">
+        <p class="slot-name">Drawn by the engine, at build time</p>
+        <p class="slug">{hero.slug}</p>
+        <h1>You bring the words. slugger never draws a pair you didn&rsquo;t allow.</h1>
+        <div class="prose">
+            <p>
+                Every name generator draws its adjective from a flat list, where anything goes
+                with anything: <code class="mono">thundering-moon</code> and
+                <code class="mono">weeping-server</code> come out as readily as
+                <code class="mono">focused-turing</code>.
+            </p>
+            <p>
+                <strong>slugger lets a noun declare what it can be.</strong> An adjective is
+                drawable for a noun only when the two share a category — so a vocabulary you
+                wrote never produces a pair you would not want to read.
+            </p>
+        </div>
+    </section>
+
+    <section class="shell">
+        <h2>Three themes ship with it</h2>
+        <ul class="marks">
+            {
+                rest.map((sample) => (
+                    <li>
+                        <code class="mono">{sample.slug}</code>
+                        <span class="slot-name"> &mdash; {sample.theme}</span>
+                    </li>
+                ))
+            }
+        </ul>
+        <p class="prose">
+            A theme is a JSON file: drop it in a directory and it is available, no code and no
+            recompiling.
+        </p>
+    </section>
+
+    <section class="shell ruled">
+        <h2>Install</h2>
+        <!--
+          The row of slots of §7.4. Each slot's command, version and state come from the
+          centralised metadata (§14.1) and never from this page, and §5.7 forbids offering a
+          copyable command for anything that is not installable.
+        -->
+        <dl class="install">
+            {
+                packages.map((pkg) => (
+                    <div>
+                        <dt>
+                            {pkg.label} &middot; {pkg.id} {pkg.version}
+                        </dt>
+                        <dd>
+                            <p class="prose">{pkg.audience}</p>
+                            {pkg.state === 'published' ? (
+                                <code class="slot-command">{pkg.command}</code>
+                            ) : (
+                                <p class="state">{stateWording[pkg.state]}</p>
+                            )}
+                        </dd>
+                    </div>
+                ))
+            }
+        </dl>
+    </section>
+</Base>

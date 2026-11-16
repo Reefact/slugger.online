@@ -1,0 +1,15 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <!-- Build-time only: this never ships in dist/. -->
+    <IsPackable>false</IsPackable>
+    <AssemblyName>sample-slugs</AssemblyName>
+    <RootNamespace>Slugger.Site.SampleSlugs</RootNamespace>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Slugger.Core" />
+  </ItemGroup>
+
+</Project>

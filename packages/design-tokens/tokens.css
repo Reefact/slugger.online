@@ -1,0 +1,130 @@
+/*
+ * The single visual source for both halves of slugger.online — specification §8.6.
+ *
+ * The site imports this file. The playground receives the same file, copied into its
+ * wwwroot by its project file, because what the two applications share crosses the
+ * technology boundary as a FILE and not as a package. Neither half redeclares a value,
+ * and no component carries a colour, space or weight literal: §16 checks it, on both
+ * sides, and the playground is the side that will try (§8.6).
+ *
+ * EVERY NAME SAYS WHAT THE COLOUR DOES, NEVER WHAT IT IS — §8.4. A light theme
+ * redefines these same names; it must never have to hunt literals in components. That
+ * rule is why there is no `--brown` and no `--gold` below.
+ *
+ * The register is the scorecard, never the stands (§8.1): leather, infield dirt and
+ * the cream of a ruled card are the only colours borrowed from the sport. THERE IS NO
+ * GRASS TOKEN, deliberately — green is reserved for what passes a rule (§8.2), on the
+ * most important screen of the site, and an ambient green would take that meaning away.
+ */
+
+:root {
+    /* --- Ground and surfaces: warm near-black, leather, infield dirt (§8.2) --- */
+    --ground: #15110d;
+    --surface: #221b14;
+    --surface-raised: #2d241a;
+
+    /* --- Ink, and the ruled lines of a scorecard (§8.7) --- */
+    --ink: #f3ede4;
+    --ink-dim: #b8ab97;
+    --ink-faint: #8b7e6c;
+    --rule: #403327;
+    --rule-strong: #5d4b38;
+
+    /* --- The slug: focal point of almost every screen (§8.2) --- */
+    --slug: #f0b429;
+
+    /* --- The words of a theme, read as vocabulary on a card --- */
+    --word: #dbcaa8;
+
+    /*
+     * --- The two reserved colours. Neither is ever decoration. ---
+     *
+     * `--passes` is green and says one thing only: this cleared a rule. `--refused`
+     * separates from the leather surfaces by SATURATION AND LIGHTNESS rather than by hue
+     * alone, because two neighbouring warms would stop a refusal standing out at the
+     * moment it matters most (§8.2). §13.4 forbids either carrying meaning by colour
+     * alone, so both always travel with words.
+     */
+    --passes: #7cc47f;
+    --refused: #ff7a6a;
+
+    /* --- The state marker of §5.7: neither accent nor error, and cool so it cannot be read as either --- */
+    --state: #9aa7ad;
+
+    /*
+     * --- The pool of a noun, which is INFORMATION and not an effect (§8.2) ---
+     *
+     * Showing that a word can reach a noun and another cannot needs two treatments that
+     * are neither a success nor a failure. Cool for reachable, so it is never mistaken for
+     * `--passes`; receding warm for unreachable, so it is never mistaken for `--refused`.
+     * §13.4 still applies: the distinction never rests on these alone.
+     */
+    --pool-reachable: #ccd6da;
+    --pool-unreachable: #6d6153;
+
+    /* --- Type: the monospace carries more weight than usual, because a scorecard is a grid (§8.3) --- */
+    --font-prose: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+    --font-mono: ui-monospace, "SFMono-Regular", "Cascadia Mono", "Liberation Mono", Menlo, monospace;
+    --weight-normal: 400;
+    --weight-medium: 500;
+    --weight-strong: 650;
+
+    --text-xs: 0.75rem;
+    --text-sm: 0.875rem;
+    --text-base: 1rem;
+    --text-lg: clamp(1.125rem, 1rem + 0.6vw, 1.375rem);
+    --text-xl: clamp(1.5rem, 1.2rem + 1.6vw, 2.25rem);
+    --text-display: clamp(2rem, 1.4rem + 3.4vw, 3.75rem);
+
+    /* --- Space --- */
+    --space-1: 0.25rem;
+    --space-2: 0.5rem;
+    --space-3: 0.75rem;
+    --space-4: 1rem;
+    --space-6: 1.5rem;
+    --space-8: 2rem;
+    --space-12: 3rem;
+    --space-16: 4rem;
+
+    /* 16px of side gutter, so nothing touches the edge at phone width (§13.4) */
+    --gutter: 1rem;
+    --measure: 68ch;
+
+    --radius-sm: 3px;
+    --radius: 6px;
+
+    /* --- Motion. Every duration here belongs to something that explains (§5.3). --- */
+    --motion-fast: 120ms;
+    --motion: 220ms;
+    --motion-ease: cubic-bezier(0.2, 0, 0.2, 1);
+}
+
+/*
+ * The light theme is not designed yet, and §8.4 only requires that the architecture
+ * never make it impossible. This block is the proof: the same names, redefined, with no
+ * component changing. Values here are provisional.
+ */
+:root[data-theme="light"] {
+    --ground: #f7f2e9;
+    --surface: #efe7d8;
+    --surface-raised: #e6dbc6;
+    --ink: #1d1710;
+    --ink-dim: #4f4336;
+    --ink-faint: #6f6353;
+    --rule: #cdbfa5;
+    --rule-strong: #a8957a;
+    --slug: #8a5a00;
+    --word: #4a3d26;
+    --passes: #1f6b3a;
+    --refused: #a8301f;
+    --state: #4a5a62;
+    --pool-reachable: #2c3d45;
+    --pool-unreachable: #9a8e7d;
+}
+
+@media (prefers-reduced-motion: reduce) {
+    :root {
+        --motion-fast: 1ms;
+        --motion: 1ms;
+    }
+}

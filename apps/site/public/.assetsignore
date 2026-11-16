@@ -1,0 +1,3 @@
+# Not served as assets: Workers parses these two and applies their rules instead.
+_headers
+_redirects

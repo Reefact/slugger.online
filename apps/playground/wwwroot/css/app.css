@@ -1,0 +1,130 @@
+/*
+ * The playground's own layout. EVERY value comes from tokens.css, the single visual
+ * source the site and this half share (§8.6) — and this is the half the rule will break
+ * on, because these components live far from the site's stylesheets, in a project whose
+ * toolchain is not the same, where the reflex is to write a value in place. §16 checks it.
+ */
+
+*,
+*::before,
+*::after {
+    box-sizing: border-box;
+}
+
+body {
+    margin: 0;
+    background: var(--ground);
+    color: var(--ink);
+    font-family: var(--font-prose);
+    font-size: var(--text-base);
+    line-height: 1.6;
+    overflow-x: hidden;
+}
+
+:focus-visible {
+    outline: 2px solid var(--slug);
+    outline-offset: 2px;
+}
+
+.shell {
+    width: 100%;
+    max-width: 72rem;
+    margin: 0 auto;
+    padding-inline: var(--gutter);
+}
+
+.site-header {
+    display: flex;
+    gap: var(--space-4);
+    align-items: baseline;
+    border-bottom: 1px solid var(--rule);
+    padding-block: var(--space-4);
+}
+
+.wordmark {
+    font-family: var(--font-mono);
+    font-weight: var(--weight-strong);
+    color: var(--ink);
+    text-decoration: none;
+}
+
+main {
+    padding-block: var(--space-12) var(--space-16);
+}
+
+.slot-name {
+    font-size: var(--text-xs);
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--ink-faint);
+    margin: 0;
+}
+
+.slug {
+    font-family: var(--font-mono);
+    font-weight: var(--weight-strong);
+    color: var(--slug);
+    font-size: var(--text-display);
+    line-height: 1.1;
+    overflow-wrap: anywhere;
+    margin-block: var(--space-2) var(--space-8);
+}
+
+.prose {
+    max-width: var(--measure);
+    color: var(--ink-dim);
+}
+
+.controls {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-4);
+    align-items: end;
+    margin-bottom: var(--space-8);
+}
+
+.controls label {
+    display: grid;
+    gap: var(--space-1);
+}
+
+select,
+button {
+    font-family: var(--font-mono);
+    font-size: var(--text-sm);
+    color: var(--ink);
+    background: var(--surface-raised);
+    border: 1px solid var(--rule-strong);
+    border-radius: var(--radius-sm);
+    padding: var(--space-2) var(--space-3);
+}
+
+button {
+    color: var(--ground);
+    background: var(--slug);
+    border-color: var(--slug);
+    font-weight: var(--weight-strong);
+    cursor: pointer;
+}
+
+.booting {
+    padding-block: var(--space-12);
+}
+
+/* Blazor's own error strip, dressed in the site's tokens rather than its default yellow. */
+#blazor-error-ui {
+    display: none;
+    position: fixed;
+    inset-inline: 0;
+    bottom: 0;
+    z-index: 20;
+    padding: var(--space-3) var(--gutter);
+    background: var(--surface-raised);
+    border-top: 1px solid var(--refused);
+    color: var(--ink);
+    font-size: var(--text-sm);
+}
+
+#blazor-error-ui .reload {
+    color: var(--ink);
+}

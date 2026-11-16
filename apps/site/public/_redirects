@@ -1,0 +1,24 @@
+# Cloudflare redirect rules for the deployed artefact.
+#
+# Astro copies this file verbatim from public/ to the root of dist/. On Workers it is never
+# served as an asset: it is parsed, and its rules are applied to asset responses.
+#
+# The playground is a single-page application: its client-side routes exist only once Blazor
+# is running, so a cold request to one of them must be answered with the application shell
+# rather than a 404. Those rules go here as REWRITES (status 200), never redirects — the
+# visitor's URL has to survive, or the router has nothing left to route on when it starts.
+#
+# Two shapes look correct and are not, and both are asserted by scripts/verify-output.sh:
+#
+#   ONE RULE PER DECLARED ROUTE — never a splat over /playground/*. A splat is discarded
+#   outright ("Infinite loop detected in this rule and has been ignored"), because the host
+#   canonicalises /playground/index.html to /playground/, which the splat matches again.
+#   Nothing fails loudly: the file parses, the site deploys, and the rule does not exist.
+#
+#   THE TARGET IS THE DIRECTORY — never index.html, which answers 307 to /playground/ and
+#   destroys the very URL the rewrite exists to preserve.
+#
+# The root route needs no rule: /playground/ is dist/playground/index.html, which the host
+# serves as the directory index. The playground declares no client-side route yet, so there
+# is nothing to list — a route added there and forgotten here works in every click-through
+# and 404s on a cold link, which is the version of the bug that reaches a visitor.

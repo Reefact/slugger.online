@@ -1,0 +1,262 @@
+/*
+ * Every value here comes from the shared tokens (§8.6). No colour, space or weight
+ * literal appears below, and §16 checks that on both halves.
+ */
+@import '@slugger/design-tokens/tokens.css';
+
+*,
+*::before,
+*::after {
+    box-sizing: border-box;
+}
+
+html {
+    -webkit-text-size-adjust: 100%;
+}
+
+body {
+    margin: 0;
+    background: var(--ground);
+    color: var(--ink);
+    font-family: var(--font-prose);
+    font-size: var(--text-base);
+    line-height: 1.6;
+    /* Nothing is ever wider than the viewport — §13.4, and the browser suite checks it. */
+    overflow-x: hidden;
+}
+
+/* Visible focus, everywhere, because §13.4 asks for it and a default outline on a warm
+   dark ground is not reliably visible. */
+:focus-visible {
+    outline: 2px solid var(--slug);
+    outline-offset: 2px;
+}
+
+.visually-hidden {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    margin: -1px;
+    padding: 0;
+    overflow: hidden;
+    clip-path: inset(50%);
+    white-space: nowrap;
+}
+
+.skip-link {
+    position: absolute;
+    left: var(--space-2);
+    top: var(--space-2);
+    z-index: 10;
+    padding: var(--space-2) var(--space-3);
+    background: var(--surface-raised);
+    color: var(--ink);
+    border: 1px solid var(--rule-strong);
+    border-radius: var(--radius-sm);
+    transform: translateY(-200%);
+}
+
+.skip-link:focus {
+    transform: none;
+}
+
+.shell {
+    width: 100%;
+    max-width: 72rem;
+    margin: 0 auto;
+    padding-inline: var(--gutter);
+}
+
+/*
+ * THE SCORECARD SURFACE LANGUAGE — §8.7.
+ *
+ * Thin cream rules rather than grey borders, and an assumed grid. This is the one place
+ * the register is implemented rather than described, so it lives here and not in a
+ * component.
+ */
+.card {
+    background: var(--surface);
+    border: 1px solid var(--rule);
+    border-radius: var(--radius);
+    padding: var(--space-6);
+}
+
+.ruled {
+    border-top: 1px solid var(--rule);
+}
+
+/*
+ * The diamond marker — a rotated square, which survives the size a list marker has,
+ * where a stitched sphere is a noisy grey dot (§8.7). Filled or open means something on a
+ * scorecard; the open form is `.marks--open`.
+ */
+.marks {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+}
+
+.marks > li {
+    position: relative;
+    padding-left: var(--space-6);
+    margin-block: var(--space-2);
+}
+
+.marks > li::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 0.6em;
+    width: 0.5em;
+    height: 0.5em;
+    background: var(--slug);
+    transform: rotate(45deg);
+}
+
+.marks--open > li::before {
+    background: transparent;
+    border: 1px solid var(--rule-strong);
+}
+
+/* The slug is the focal point of almost every screen — §8.2. */
+.slug {
+    font-family: var(--font-mono);
+    font-weight: var(--weight-strong);
+    color: var(--slug);
+    font-size: var(--text-display);
+    line-height: 1.1;
+    overflow-wrap: anywhere;
+}
+
+code,
+kbd,
+samp,
+pre,
+.mono {
+    font-family: var(--font-mono);
+}
+
+.prose {
+    max-width: var(--measure);
+    color: var(--ink-dim);
+}
+
+.prose strong {
+    color: var(--ink);
+    font-weight: var(--weight-medium);
+}
+
+h1,
+h2,
+h3 {
+    font-weight: var(--weight-strong);
+    line-height: 1.15;
+    letter-spacing: -0.01em;
+    color: var(--ink);
+}
+
+h1 {
+    font-size: var(--text-xl);
+}
+
+h2 {
+    font-size: var(--text-lg);
+}
+
+a {
+    color: var(--ink);
+    text-decoration-color: var(--rule-strong);
+    text-underline-offset: 0.2em;
+}
+
+a:hover {
+    text-decoration-color: var(--slug);
+}
+
+/*
+ * The install row — §7.4. A row of slots, not a fixed composition: the product ships as
+ * two packages that do not install the same way nor for the same reader, and the slots do
+ * not necessarily carry the same publication state.
+ */
+.install {
+    display: grid;
+    gap: var(--space-4);
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 20rem), 1fr));
+    margin: 0;
+    padding: 0;
+    list-style: none;
+}
+
+.install dt,
+.slot-name {
+    font-size: var(--text-xs);
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--ink-faint);
+}
+
+.slot-command {
+    display: block;
+    margin-top: var(--space-2);
+    padding: var(--space-3);
+    background: var(--surface-raised);
+    border: 1px solid var(--rule);
+    border-radius: var(--radius-sm);
+    font-family: var(--font-mono);
+    font-size: var(--text-sm);
+    color: var(--word);
+    overflow-x: auto;
+}
+
+/*
+ * §5.7: a state is said in plain words, never by hover and never by colour alone (§13.4).
+ * `--state` is the neutral tone reserved for exactly this, distinct from the accent and
+ * from the error.
+ */
+.state {
+    display: inline-block;
+    margin-top: var(--space-2);
+    font-size: var(--text-xs);
+    color: var(--state);
+}
+
+.site-header {
+    border-bottom: 1px solid var(--rule);
+    padding-block: var(--space-4);
+}
+
+.site-header .shell {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-4);
+    align-items: baseline;
+    justify-content: space-between;
+}
+
+.wordmark {
+    font-family: var(--font-mono);
+    font-weight: var(--weight-strong);
+    text-decoration: none;
+}
+
+.nav {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-4);
+    font-size: var(--text-sm);
+}
+
+main {
+    padding-block: var(--space-12) var(--space-16);
+}
+
+section + section {
+    margin-top: var(--space-12);
+}
+
+.site-footer {
+    border-top: 1px solid var(--rule);
+    padding-block: var(--space-6);
+    font-size: var(--text-sm);
+    color: var(--ink-faint);
+}

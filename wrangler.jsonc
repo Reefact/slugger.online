@@ -1,0 +1,48 @@
+{
+    "$schema": "./node_modules/wrangler/config-schema.json",
+
+    "name": "slugger-online",
+    "compatibility_date": "2026-11-01",
+
+    // The site answers on slugger.online and nowhere else.
+    //
+    // Left at its default, this Worker also answers on
+    // slugger-online.<subdomain>.workers.dev — the same bytes under a second hostname,
+    // which search engines index, visitors bookmark and links point at, none of it
+    // intended. Turning it off is the only way to make the custom domain the site's
+    // address rather than one of its addresses.
+    //
+    // The cost is real: a first deployment then has no hostname at all until the domain is
+    // attached. It does NOT govern preview URLs, which are controlled separately.
+    "workers_dev": false,
+
+    // NO SCRIPT — specification §12.3.
+    //
+    // Requests served as static assets are free and unmetered; requests that invoke a
+    // Worker script count against the plan's request quota, and exhausting that quota
+    // answers an error rather than falling back to the assets. The difference between a
+    // script and no script is the difference between a site that degrades and a site that
+    // goes down.
+    //
+    // Introducing one is a decision to take on purpose, never to discover in a diff, and
+    // it is only acceptable if the script stays OFF THE PATH of everything the site serves,
+    // so the quota it can exhaust is its own.
+    //
+    // The case that will tempt a script is shareable playground URLs, and the answer there
+    // is no (§10.7): encoding the state in the URL fragment costs nothing on the server,
+    // and a theme the visitor opened is not shareable at all because §10.6 refuses to
+    // transmit it.
+
+    "assets": {
+        "directory": "./dist/",
+
+        // "404-page" serves the nearest 404.html for a request matching no asset.
+        //
+        // Not "single-page-application": this site is many pages, and that mode would
+        // answer 200 with the home page for every mistyped URL — invisible to a visitor and
+        // poison to a search engine. The playground is the one part that needs a shell
+        // fallback, and it gets it from the rewrites in _redirects rather than from a mode
+        // that would apply site-wide.
+        "not_found_handling": "404-page"
+    }
+}

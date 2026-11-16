@@ -1065,14 +1065,34 @@ dit plutôt que de laisser chercher le bouton.
 
 ### 10.8 Contraintes d'élagage
 
-Élagage activé. **Avertissements d'élagage traités comme des erreurs**, et non regroupés,
-pour que chacun soit visible. Aucune réflexion dans le code du playground.
+Élagage activé, avertissements non regroupés, et **aucune réflexion dans le code du
+playground**.
 
-Et la règle qui compte plus que les précédentes réunies : **les tests de bout en bout
+La version précédente de cette section demandait que tout avertissement d'élagage soit
+traité comme une erreur. C'était inatteignable, et le construire l'a montré : le cadriciel
+WebAssembly résout les paramètres de composant et l'interopérabilité JavaScript par
+réflexion, et **avertit sur lui-même**. Rien dans ce dépôt ne corrige cela. Le réglage que
+la plateforme offre contre ce bruit les masque tous — y compris celui qui viendrait de notre
+code, le seul qui vaille d'être vu.
+
+D'où la frontière, qui remplace la règle :
+
+> **Un avertissement d'élagage qui naît dans le cadriciel est consigné et toléré. Un
+> avertissement qui naît ailleurs — ce dépôt, ou le moteur — échoue.**
+
+Les faire taire par identifiant aurait masqué les deux ensemble, puisque les identifiants
+sont communs. C'est la discipline du dépôt de la bibliothèque — aucune mise sous silence en
+bloc — appliquée à une frontière que ce dépôt ne possède pas.
+
+Et la règle qui compte plus que toutes les précédentes réunies : **les tests de bout en bout
 s'exécutent sur l'artefact publié**, jamais sur un build de développement. C'est la seule
 qui attrape la classe de défauts qui n'existe qu'après élagage — et le moteur charge ses
-thèmes embarqués comme des ressources, ce qui est exactement le genre de chose qu'un
-élagueur retire quand rien ne la nomme.
+thèmes embarqués comme des ressources, ce qui est exactement le genre de chose qu'un élagueur
+retire quand rien ne la nomme.
+
+Elle a déjà servi, et pas pour l'élagage : c'est elle qui a trouvé que l'empreinte des assets
+du playground ne peut pas fonctionner sur un hébergeur statique (§13.1). Le build était vert,
+la page se chargeait, et l'application mourait. Rien d'autre ne le disait.
 
 ### 10.9 Chargement
 
@@ -1275,7 +1295,10 @@ les découvrir en production :
 - la prise en compte effective des fichiers d'en-têtes et de redirections ;
 - l'ordre entre le service d'un asset et l'application d'une règle de réécriture ;
 - l'unicité, la stabilité et la rétention des URL de prévisualisation ;
-- la compression réellement appliquée aux ressources WebAssembly.
+- la compression réellement appliquée aux ressources WebAssembly ;
+- l'invalidation du runtime du playground, dont les fichiers portent un nom stable et sont
+  mis en cache par chemin (§13.1) : qu'une nouvelle version atteigne un visiteur qui tient
+  l'ancienne.
 
 Chacune est marquée comme telle là où elle est configurée, pour que la vérification ait un
 lecteur.
@@ -1293,6 +1316,18 @@ strict une fois le domaine validé.
 Le cache distingue trois régimes : le HTML est **toujours revalidé**, car c'est le document
 qui nomme les assets empreintés ; les assets empreintés sont immuables ; ce qui n'est pas
 empreinté prend une durée courte.
+
+**Le runtime du playground n'entre dans aucun des trois, et c'est une contrainte et non un
+choix.** Ses fichiers ne peuvent pas être empreintés : la carte qui relie un nom logique à
+son nom empreint est écrite hors du répertoire servi, donc un hébergeur d'assets statiques
+ne peut pas la lire. Le chargeur demande alors le nom logique, l'hébergeur répond 404, et
+l'application meurt au démarrage — sans qu'aucun build échoue. L'empreinte est donc
+désactivée là, les noms sont stables, et ces fichiers — les plus lourds de l'artefact, et
+ceux qui ne changent qu'à une publication — sont mis en cache **par chemin**, pas par nom.
+
+La conséquence est qu'un déploiement doit pouvoir invalider ce chemin, et §12.5 ajoute donc
+ce point à ce que seul un déploiement réel règle : vérifier qu'une nouvelle version du
+runtime atteint un visiteur qui tient l'ancienne en cache.
 
 ### 13.2 La politique de contenu et WebAssembly
 
@@ -1520,6 +1555,9 @@ transformés en contrôles ; il est aussi la liste de ce qu'on saura *ne pas* av
 | Aucun mot employé hors du vocabulaire de la bibliothèque | 5.9 | Vérification des chaînes, contre la surface publique |
 | Aucune métrique de qualité affichée | 5.10 | Vérification des chaînes |
 | Un littéral de couleur, d'espace ou de graisse hors de la source visuelle | 8.6 | Échec de build, des deux côtés |
+| Un avertissement d'élagage né ailleurs que dans le cadriciel | 10.8 | `scripts/check-trim.sh`, sur une publication propre |
+| Un asset référencé par une page et absent de l'artefact | 12.2 | Vérification de l'artefact |
+| Le playground démarre et tire un slug | 10.8 | Suite navigateur, sur l'artefact publié |
 | Le vert employé ailleurs que pour ce qui passe une règle | 8.2 | Échec de build : le token est lié à ce seul rôle |
 | Un composant présenté comme disponible sans version résoluble | 5.7 | Échec de build |
 | Une chaîne affichée écrite en dur dans un composant | 6.2 | Échec de build |

@@ -1,0 +1,83 @@
+@*
+    THE WHOLE APPLICATION, with no router and no layout component — and that is a trimming
+    decision as much as a simplicity one (§10.8).
+
+    Blazor's <Router> and <LayoutView> resolve layouts and route components through
+    reflection, which the trimmer cannot follow: they produce IL2110/IL2111 warnings that no
+    change to this repository can fix, and §10.8 makes a trim warning an error in continuous
+    integration. The playground has nothing to route — its state lives in the URL fragment
+    (§10.7), and a theme the visitor opened is never addressable at all (§10.6) — so the
+    router was cost without purpose.
+
+    A client-side route added later brings the router back, and with it a line per route in
+    apps/site/public/_redirects. Neither is needed while this is one page.
+*@
+
+<div class="shell">
+    <header class="site-header">
+        <a class="wordmark" href="/">slugger</a>
+        <span class="slot-name">Playground</span>
+    </header>
+
+    <main id="main">
+        <p class="slot-name">Drawn in your browser, by the engine itself</p>
+        <p class="slug" data-slug>@_slug</p>
+
+        <div class="controls">
+            <label>
+                <span class="slot-name">Theme</span>
+                <select @bind="_theme" @bind:after="Draw">
+                    @foreach (string name in Themes)
+                    {
+                        <option value="@name">@name</option>
+                    }
+                </select>
+            </label>
+
+            <label>
+                <span class="slot-name">Casing</span>
+                <select @bind="_casing" @bind:after="Draw">
+                    @foreach (Casing casing in Casings)
+                    {
+                        <option value="@casing">@casing</option>
+                    }
+                </select>
+            </label>
+
+            <button type="button" @onclick="Draw">Draw another</button>
+        </div>
+
+        <p class="prose">
+            <strong>@_combinations.ToString("N0")</strong> distinct names are reachable with
+            these options. Nothing you choose here leaves your browser, and there is no second
+            generator: the engine on this page is the one the command runs.
+        </p>
+    </main>
+</div>
+
+@code {
+
+    // The engine's own list, never one typed here: a theme added to the package appears
+    // without this file changing (§2).
+    private static readonly IReadOnlyList<string> Themes = SluggerTheme.EmbeddedNames;
+
+    private static readonly Casing[] Casings = Enum.GetValues<Casing>();
+
+    private string _theme = Themes[0];
+    private Casing _casing = Casing.Kebab;
+    private string _slug = string.Empty;
+    private long _combinations;
+
+    protected override void OnInitialized() {
+        Draw();
+    }
+
+    private void Draw() {
+        SluggerTheme theme = SluggerTheme.LoadEmbeddedOrThrow(_theme);
+        SlugGenerator generator = SlugGenerator.ForOrThrow(theme, options => options with { Casing = _casing });
+
+        _combinations = generator.Combinations;
+        _slug = generator.Next();
+    }
+
+}

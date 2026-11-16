@@ -1,0 +1,15 @@
+# The deployment, assembled by scripts/build-site.sh.
+dist/
+
+# Generated: build-time slugs and the version stamp. Both descend from a source by a
+# mechanism (specification §2), so neither is committed.
+apps/site/src/generated/
+apps/site/public/version.json
+
+node_modules/
+.astro/
+
+bin/
+obj/
+test-results/
+.wrangler/

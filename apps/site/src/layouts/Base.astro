@@ -1,0 +1,70 @@
+---
+import '../styles/base.css';
+import { packages, repository } from '../metadata';
+
+interface Props {
+    title: string;
+    description: string;
+    /** The header carries a compact install command once the hero is passed — §7.1. */
+    showHeaderInstall?: boolean;
+}
+
+const { title, description, showHeaderInstall = true } = Astro.props;
+
+// The command, not the library: the header has room for one, and a visitor arriving at
+// the top of this site is being shown the tool (§9.3's graded exits).
+const command = packages[0];
+const canCopy = command.state === 'published';
+---
+
+<!doctype html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1" />
+        <title>{title}</title>
+        <meta name="description" content={description} />
+        <link rel="canonical" href={new URL(Astro.url.pathname, Astro.site)} />
+    </head>
+    <body>
+        <a class="skip-link" href="#main">Skip to content</a>
+
+        <header class="site-header">
+            <div class="shell">
+                <a class="wordmark" href="/">slugger</a>
+                <nav class="nav" aria-label="Sections">
+                    <!--
+                      Short, and it carries only what is publishable (§7.3). A route appears
+                      here when its content is useful to somebody and not a waiting page, so
+                      the playground, the theme catalogue and the positioning page are absent
+                      until they are built — their absence is the rule working, not an
+                      oversight.
+                    -->
+                    <a href={repository} rel="noopener">
+                        Repository<span class="visually-hidden"> (opens in a new tab)</span>
+                    </a>
+                </nav>
+                {
+                    showHeaderInstall && canCopy && (
+                        <code class="mono slot-command">{command.command}</code>
+                    )
+                }
+            </div>
+        </header>
+
+        <main id="main">
+            <slot />
+        </main>
+
+        <footer class="site-footer">
+            <div class="shell">
+                <p>
+                    slugger is Apache 2.0. This site is built from
+                    <a href={repository} rel="noopener">
+                        the repository<span class="visually-hidden"> (opens in a new tab)</span></a
+                    >.
+                </p>
+            </div>
+        </footer>
+    </body>
+</html>

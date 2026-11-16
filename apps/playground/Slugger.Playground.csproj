@@ -1,0 +1,80 @@
+<Project Sdk="Microsoft.NET.Sdk.BlazorWebAssembly">
+
+  <PropertyGroup>
+    <!--
+      The published output is copied under /playground/ of the combined artefact, so every
+      asset URL the framework writes must be rooted there. This is the build-time half;
+      wwwroot/index.html carries the matching <base href>. Both are asserted by
+      scripts/verify-output.sh, because a mismatch produces a BLANK PAGE rather than an
+      error: the document loads, and every asset URL resolves one directory too high
+      (§12.2).
+    -->
+    <StaticWebAssetBasePath>playground</StaticWebAssetBasePath>
+    <OverrideHtmlAssetPlaceholders>true</OverrideHtmlAssetPlaceholders>
+
+    <!--
+      FINGERPRINTING OFF, and not for convenience.
+
+      With it on, the runtime's own files are published under fingerprinted names and the map
+      from logical name to fingerprinted name is written to
+      Slugger.Playground.staticwebassets.endpoints.json - which sits OUTSIDE wwwroot, and is
+      therefore a file a static asset host can never read. The boot script then asks for
+      _framework/dotnet.js, the host answers 404, and the application dies with "Failed to
+      start platform". The build is green throughout, and the only thing that says so is a
+      browser: this was found by the check in tests/browser, which is the whole argument of
+      §10.8 for running end-to-end against the published artefact.
+
+      So the names stay stable, and the cache regime of §13.1 is expressed by path in the
+      host's own header rules rather than by fingerprint. What compression and caching
+      actually reach a visitor is in any case something §12.5 says only a real deployment
+      settles.
+    -->
+    <WasmFingerprintAssets>false</WasmFingerprintAssets>
+
+    <!--
+      §10.8. Trimming on, trim warnings as errors and NOT grouped, so each one is visible.
+      No reflection in this application: the engine loads its embedded themes as resources,
+      which is exactly the kind of thing a trimmer removes when nothing names it — and the
+      failure appears on the PUBLISHED artefact, never in development where trimming is off.
+      That is why the end-to-end check runs on the published output.
+    -->
+    <PublishTrimmed>true</PublishTrimmed>
+    <TrimmerSingleWarn>false</TrimmerSingleWarn>
+    <SuppressTrimAnalysisWarnings>false</SuppressTrimAnalysisWarnings>
+
+    <!--
+      The warning ratchet is scoped to continuous integration, so the local inner loop stays
+      friendly - the library's own convention.
+
+      The five IL codes below are exempted from it, and the exemption is the point rather
+      than a concession: Blazor WebAssembly's framework resolves component parameters and JS
+      interop through reflection, and warns about itself. Nothing in this repository can fix
+      those, and suppressing them by id would equally hide one raised by OUR code, since the
+      ids are shared. scripts/check-trim.sh is the real gate: it fails on any trim warning
+      that does not originate in Microsoft.* or System.*. Add a code here only after that
+      script has shown it comes from the framework.
+    -->
+    <TreatWarningsAsErrors Condition="'$(GITHUB_ACTIONS)' == 'true'">true</TreatWarningsAsErrors>
+    <WarningsNotAsErrors>IL2065;IL2072;IL2110;IL2111</WarningsNotAsErrors>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly" />
+    <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly.DevServer" PrivateAssets="all" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <!-- The engine the playground exists to run. Version: Directory.Packages.props. -->
+    <PackageReference Include="Slugger.Core" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <!--
+      §8.6: the single visual source crosses the technology boundary as a FILE, not as a
+      package. The site imports it; this copies the same file in. Neither half redeclares a
+      value, and this half is the one that will try to.
+    -->
+    <Content Include="..\..\packages\design-tokens\tokens.css" Link="wwwroot\css\tokens.css" CopyToPublishDirectory="PreserveNewest" CopyToOutputDirectory="PreserveNewest" />
+  </ItemGroup>
+
+</Project>

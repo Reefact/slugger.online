@@ -1,0 +1,16 @@
+# The Blazor playground and the sample-slug tool are not listed here: they are .NET
+# projects, and their dependencies are resolved by NuGet under Directory.Packages.props.
+# What the two applications share crosses that boundary as a FILE, not as a package —
+# packages/design-tokens is imported by the site and copied into the playground's wwwroot
+# by its project file. Specification §8.6.
+packages:
+  - "apps/site"
+  - "packages/*"
+
+# These three compile or fetch a native binary in their install script, and pnpm refuses to
+# run one unless it is named here. Astro's bundler needs esbuild, its image pipeline needs
+# sharp, and `pnpm serve` runs the Workers runtime, which is workerd.
+onlyBuiltDependencies:
+  - esbuild
+  - sharp
+  - workerd

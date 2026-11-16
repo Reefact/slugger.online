@@ -1,0 +1,21 @@
+{
+  "name": "@slugger/site",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "description": "The Astro application: landing page and content pages.",
+  "license": "Apache-2.0",
+  "scripts": {
+    "dev": "astro dev",
+    "build": "astro build",
+    "check": "astro check"
+  },
+  "dependencies": {
+    "@slugger/design-tokens": "workspace:*"
+  },
+  "devDependencies": {
+    "@astrojs/check": "^0.9.10",
+    "astro": "^5.17.0",
+    "typescript": "^5.9.3"
+  }
+}

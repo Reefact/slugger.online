@@ -1,0 +1,10 @@
+{
+  "name": "@slugger/design-tokens",
+  "version": "0.0.0",
+  "private": true,
+  "description": "Colour, space, type and motion — the single visual source the site and the playground share.",
+  "license": "Apache-2.0",
+  "exports": {
+    "./tokens.css": "./tokens.css"
+  }
+}

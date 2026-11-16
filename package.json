@@ -1,0 +1,30 @@
+{
+  "name": "slugger-online",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "description": "The official slugger website: the Astro site and the Blazor WebAssembly playground.",
+  "license": "Apache-2.0",
+  "packageManager": "pnpm@10.28.0",
+  "engines": {
+    "node": ">=22"
+  },
+  "scripts": {
+    "dev": "./scripts/generate-content.sh && pnpm --filter @slugger/site dev",
+    "build": "./scripts/build-site.sh",
+    "build:site": "pnpm --filter @slugger/site build",
+    "build:playground": "dotnet publish apps/playground/Slugger.Playground.csproj -c Release",
+    "check": "./scripts/generate-content.sh && pnpm --filter @slugger/site check",
+    "verify": "./scripts/verify-output.sh",
+    "serve": "wrangler dev",
+    "preview": "wrangler versions upload",
+    "deploy": "wrangler deploy",
+    "test:browser": "./scripts/check-in-browser.sh",
+    "check:trim": "./scripts/check-trim.sh"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.65.1",
+    "typescript": "^5.9.3",
+    "wrangler": "^4.48.0"
+  }
+}

@@ -1,0 +1,49 @@
+<!doctype html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1" />
+        <title>Playground — slugger</title>
+        <!--
+          The run-time half of the prefix agreement. The project file sets
+          StaticWebAssetBasePath to `playground`; this must match it, or every asset URL
+          resolves one directory too high and the visitor gets a blank page with no error.
+          scripts/verify-output.sh asserts the pair (§12.2).
+        -->
+        <base href="/playground/" />
+        <link rel="stylesheet" href="css/tokens.css" />
+        <link rel="stylesheet" href="css/app.css" />
+    </head>
+    <body>
+        <div id="app">
+            <!--
+              The shell shows immediately and the runtime download reports REAL progress,
+              never simulated (§10.9). This is the pre-boot state a visitor sees, and it says
+              what is happening rather than showing a spinner that means nothing.
+            -->
+            <div class="booting">
+                <p class="slot-name">Starting the engine</p>
+                <p class="prose">
+                    The playground runs the real slugger engine in your browser. It is
+                    downloading now.
+                </p>
+            </div>
+        </div>
+
+        <div id="blazor-error-ui">
+            Something went wrong. Reloading the page is the fix.
+            <a href="." class="reload">Reload</a>
+        </div>
+
+        <!--
+          THE FINGERPRINT PLACEHOLDER IS LOAD-BEARING. The boot script is published under a
+          fingerprinted name, and OverrideHtmlAssetPlaceholders rewrites this reference to
+          match it. Written as a plain "blazor.webassembly.js", the build still succeeds, the
+          page still loads, and the script 404s - the same shape of silent failure as a
+          mismatched base href (§12.2). verify-output.sh now resolves every _framework
+          reference against the artefact, because that was found in a browser rather than in
+          a build log.
+        -->
+        <script src="_framework/blazor.webassembly#[.{fingerprint}].js"></script>
+    </body>
+</html>
