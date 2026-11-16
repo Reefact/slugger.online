@@ -61,6 +61,39 @@ Act three reads a theme that is refused on purpose, which is the one exception t
 specification names. The generator fails if that file is ever *accepted*, so the exception is
 enforced from the other side rather than by lowering the rule.
 
+## The measurement
+
+There is a Worker script now, and it took a decision to put one here. Requests served as
+static assets are free and unmetered; requests that invoke a script count against a quota,
+and exhausting that quota answers an error rather than falling back to the assets.
+
+**The script is acceptable only because it is off the path.** `run_worker_first` names
+exactly one address, so a page, an asset and a 404 are all answered without invoking it —
+the quota it can exhaust is its own, and exhausting it stops the measurement rather than a
+page. Widening that list puts the site back in front of the quota.
+
+A copy event with no dimension only says that people copy. The useful thing is **which
+moment convinced them**, so each event carries a placement naming what the visitor had just
+understood — `after-the-absurd-draw`, `after-the-refusal` — and a variant saying which of
+the two packages they took. A placement indexed on a position is refused by the collector
+and by the artefact check both: a narrative page gains and loses scenes, and an ordinal key
+makes two measurement periods incomparable for the same moment.
+
+**A theme event carries nothing of the theme.** Not the words, not the categories, not the
+file name, and not its size, which is a fingerprint when the files are few. The collector
+enforces that shape rather than trusting a page to respect it, down to refusing a free-form
+variant — which is the door a theme's name would walk through.
+
+Nothing fires for arriving on a page, nothing writes a cookie, nothing touches storage, and
+the collector is first-party, so `connect-src 'self'` covers it and the content policy stays
+as narrow as it was.
+
+The journey lane the specification describes — which scenes were read, where people stop —
+is **not built**. It needs a measure able to link two visits, so it is gated on explicit
+consent, and it is a separate lane by design: a refusal costs a journey and never a total.
+Putting a consent banner in front of a site that reaches no third party and recognises
+nobody would be asking permission for nothing.
+
 ## The headers and the content policy
 
 `scripts/generate-headers.mjs` writes `dist/_headers` after the artefact exists, because the

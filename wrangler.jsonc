@@ -16,25 +16,49 @@
     // attached. It does NOT govern preview URLs, which are controlled separately.
     "workers_dev": false,
 
-    // NO SCRIPT — specification §12.3.
+    // THERE IS A SCRIPT NOW, and §12.3 asks that putting one here be a decision rather than
+    // something discovered in a diff. This is the decision.
     //
-    // Requests served as static assets are free and unmetered; requests that invoke a
-    // Worker script count against the plan's request quota, and exhausting that quota
-    // answers an error rather than falling back to the assets. The difference between a
-    // script and no script is the difference between a site that degrades and a site that
-    // goes down.
+    // What that section said, and why it was right to say it: requests served as static
+    // assets are free and unmetered, requests that invoke a Worker script count against the
+    // plan's request quota, and exhausting that quota answers an error rather than falling
+    // back to the assets. The difference between a script and no script was the difference
+    // between a site that degrades and a site that goes down.
     //
-    // Introducing one is a decision to take on purpose, never to discover in a diff, and
-    // it is only acceptable if the script stays OFF THE PATH of everything the site serves,
-    // so the quota it can exhaust is its own.
+    // What changed is not the appetite for a script, it is what one costs when it is kept
+    // OFF THE PATH. A request matching a static asset is served from the asset store without
+    // invoking the script; a request matching none is answered by "not_found_handling", also
+    // without invoking it. Only the paths named in "run_worker_first" reach the script at
+    // all. So the quota this script can exhaust is its own, and exhausting it stops the
+    // measurement — not a page, not an asset, not the 404.
     //
-    // The case that will tempt a script is shareable playground URLs, and the answer there
-    // is no (§10.7): encoding the state in the URL fragment costs nothing on the server,
-    // and a theme the visitor opened is not shareable at all because §10.6 refuses to
-    // transmit it.
+    // That confinement is the whole basis of the decision. Widening "run_worker_first", or
+    // dropping it, puts the site back in front of the quota and is not a change to make
+    // without reopening §12.3.
+    //
+    // The other case that will tempt a script is still shareable playground URLs, and the
+    // answer there is still no (§10.7): encoding the state in the URL fragment costs nothing
+    // on the server, and a theme the visitor opened is not shareable at all because §10.6
+    // refuses to transmit it.
+    "main": "worker/index.ts",
+
+    // Where the dimensioned events land (§15.2). A data point here is one visitor copying
+    // one install command, or one theme author trying a file — never anything of the file.
+    "analytics_engine_datasets": [
+        {
+            "binding": "MEASUREMENT",
+            "dataset": "slugger_measurement"
+        }
+    ],
 
     "assets": {
         "directory": "./dist/",
+
+        // THE ONE PATH THAT REACHES THE SCRIPT. Everything absent from this list keeps the
+        // asset-first behaviour described above, which is what makes the script unable to
+        // affect the site. An exact path, not a glob: the collector answers on one address
+        // and has no second one to grow into.
+        "run_worker_first": ["/_event"],
 
         // "404-page" serves the nearest 404.html for a request matching no asset.
         //

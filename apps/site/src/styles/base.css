@@ -747,3 +747,37 @@ section + section {
 .sources dd {
     margin: var(--space-1) 0 0;
 }
+
+/*
+ * The copy button — §7.1. Added by script only where the clipboard works, so it is never a
+ * control that leads nowhere (§5.7).
+ */
+.command-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-2);
+    align-items: start;
+}
+
+.command-row .slot-command {
+    flex: 1 1 18rem;
+    margin-top: var(--space-2);
+}
+
+.copy {
+    margin-top: var(--space-2);
+    padding: var(--space-3);
+    font-family: var(--font-mono);
+    font-size: var(--text-xs);
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--ground);
+    background: var(--slug);
+    border: 1px solid var(--slug);
+    border-radius: var(--radius-sm);
+    cursor: pointer;
+}
+
+.site-header .copy {
+    margin-top: 0;
+}

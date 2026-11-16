@@ -1,6 +1,7 @@
 ---
 import '../styles/base.css';
 import { packages, repository } from '../metadata';
+import { placements } from '../measurement';
 
 interface Props {
     title: string;
@@ -47,7 +48,12 @@ const canCopy = command.state === 'published';
                 </nav>
                 {
                     showHeaderInstall && canCopy && (
-                        <code class="mono slot-command">{command.command}</code>
+                        <code
+                            class="mono slot-command"
+                            data-command
+                            data-placement={placements.header}
+                            data-variant={command.id}
+                        >{command.command}</code>
                     )
                 }
             </div>
@@ -67,5 +73,9 @@ const canCopy = command.state === 'published';
                 </p>
             </div>
         </footer>
+
+        <script>
+            import '../scripts/copy';
+        </script>
     </body>
 </html>

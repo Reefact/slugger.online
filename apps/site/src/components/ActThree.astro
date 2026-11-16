@@ -1,5 +1,6 @@
 ---
 import Exit from './Exit.astro';
+import { placements } from '../measurement';
 import { narration } from '../narrative';
 import { ruleLabel } from '../catalogue';
 
@@ -112,6 +113,7 @@ for (const reason of act.refusals) {
         <Exit
             lead="You have seen what writing a theme costs and what answers for it. The command is what measures and registers one."
             offers={['Slugger']}
+            placement={placements.afterTheRefusal}
             extra={{ href: '/themes/', label: 'Themes already written, measured by the engine' }}
         />
     </div>

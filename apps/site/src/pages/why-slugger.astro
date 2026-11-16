@@ -1,5 +1,7 @@
 ---
 import Base from '../layouts/Base.astro';
+import Exit from '../components/Exit.astro';
+import { placements } from '../measurement';
 import {
     axes,
     freshnessDays,
@@ -235,6 +237,13 @@ const others = options.filter((option) => option.id !== 'slugger');
             Last checked against its sources on {verifiedOn}. The build warns once that is more
             than {freshnessDays} days old.
         </p>
+        <Exit
+            lead="You have read the reasons not to use it. If none of them is yours, it introduces itself on one run, with nothing removed."
+            offers={['Slugger', 'Slugger.Core']}
+            placement={placements.afterTheComparison}
+            extra={{ href: '/playground/', label: 'Or draw one in your browser first' }}
+        />
+
         <p class="prose">
             <a href={rightOfReply} rel="noopener">
                 If this gets your tool wrong, tell us

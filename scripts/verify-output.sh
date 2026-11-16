@@ -157,6 +157,20 @@ if [[ -s $narrative ]] && grep -q '"refusals"' "$narrative"; then ok; else
     bad "$narrative carries no refusal — act three has nothing to read"
 fi
 
+# §15.2 — A MEASUREMENT PLACEMENT NAMES A MOMENT, NEVER A POSITION. The collector refuses
+# one too, and both are wanted: the collector catches what a page sends, this catches what a
+# page carries before anybody clicks it.
+check "no measurement placement is indexed on a position (§15.2)"
+positional="$(grep -rhoE 'data-placement="[^"]*(^|[-_])([0-9]+|first|second|third|fourth|fifth|last|next|previous)([-_]|")[^"]*"' \
+    dist --include='*.html' 2>/dev/null || true)"
+if [[ -z $positional ]]; then ok; else bad "$positional"; fi
+
+# §12.3 — the script is acceptable only because it is OFF THE PATH. This is the line that
+# makes that true, and widening it puts the whole site back in front of the request quota.
+check "the worker answers on one address and no other (§12.3)"
+confined="$(grep -o '"run_worker_first": \["/_event"\]' wrangler.jsonc | wc -l || true)"
+[[ $confined -eq 1 ]] && ok || bad "run_worker_first must name exactly [\"/_event\"]"
+
 # §13.1, §13.2 — THE RESPONSE HEADERS. The file is in the artefact; whether the host
 # applies it is something only a served response can say, and tests/browser/headers.spec.ts
 # asks that question against the runtime production uses.

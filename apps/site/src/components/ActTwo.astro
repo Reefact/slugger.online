@@ -1,5 +1,6 @@
 ---
 import Exit from './Exit.astro';
+import { placements } from '../measurement';
 import { narration } from '../narrative';
 
 const act = narration.actOne;
@@ -47,6 +48,7 @@ const act = narration.actOne;
         <Exit
             lead="You have seen the engine and the command that drives it. Both install on their own."
             offers={['Slugger', 'Slugger.Core']}
+            placement={placements.afterTheWordsAreYours}
             extra={{ href: '/themes/', label: 'Every theme slugger ships or carries' }}
         />
     </div>

@@ -1,5 +1,6 @@
 ---
 import Exit from './Exit.astro';
+import { placements } from '../measurement';
 import { narration } from '../narrative';
 
 const act = narration.actOne;
@@ -88,6 +89,7 @@ const times = Math.round(act.combinationsWithout / act.combinationsWithCategorie
         <Exit
             lead="If that is the whole of what you needed, this is where you can stop reading. The engine draws from a vocabulary of your own, from C# or from a terminal."
             offers={['Slugger.Core']}
+            placement={placements.afterTheAbsurdDraw}
         />
     </div>
 </section>

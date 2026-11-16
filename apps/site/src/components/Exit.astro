@@ -1,15 +1,18 @@
 ---
 import { packages, stateWording } from '../metadata';
+import type { Placement } from '../measurement';
 
 interface Props {
     /** What the visitor has just understood — never more (§9.3). */
     lead: string;
     /** Which package ids this exit offers, in order. A graded exit offers what was shown. */
     offers: readonly string[];
+    /** The moment this exit sits at, named for what was understood (§15.2). */
+    placement: Placement;
     extra?: { readonly href: string; readonly label: string };
 }
 
-const { lead, offers, extra } = Astro.props;
+const { lead, offers, placement, extra } = Astro.props;
 const shown = packages.filter((pkg) => offers.includes(pkg.id));
 ---
 
@@ -29,10 +32,26 @@ const shown = packages.filter((pkg) => offers.includes(pkg.id));
                     </dt>
                     <dd>
                         {pkg.state === 'published' ? (
-                            <code class="slot-command">{pkg.command}</code>
+                            <div class="command-row">
+                                {/*
+                                  The command is readable and selectable with no script. The
+                                  copy button is ADDED only where the clipboard works, because
+                                  §5.7 refuses anything visible that leads nowhere.
+
+                                  The placement says which moment convinced them, and the
+                                  variant which half they took — the engine and the command do
+                                  not say the same thing about a reader (§15.2).
+                                */}
+                                <code
+                                    class="slot-command"
+                                    data-command
+                                    data-placement={placement}
+                                    data-variant={pkg.id}
+                                >
+                                    {pkg.command}
+                                </code>
+                            </div>
                         ) : (
-                            /* §5.7: nothing copyable for what is not installable, and the
-                               state is said in words rather than implied by an absence. */
                             <p class="state">{stateWording[pkg.state]}</p>
                         )}
                     </dd>
@@ -42,3 +61,7 @@ const shown = packages.filter((pkg) => offers.includes(pkg.id));
     </dl>
     {extra && <p class="prose"><a href={extra.href}>{extra.label}</a></p>}
 </aside>
+
+<script>
+    import '../scripts/copy';
+</script>
