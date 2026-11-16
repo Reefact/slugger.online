@@ -20,7 +20,8 @@
     "preview": "wrangler versions upload",
     "deploy": "wrangler deploy",
     "test:browser": "./scripts/check-in-browser.sh",
-    "check:trim": "./scripts/check-trim.sh"
+    "check:trim": "./scripts/check-trim.sh",
+    "check:comparison": "node ./scripts/check-comparison.mjs"
   },
   "devDependencies": {
     "@playwright/test": "^1.65.1",

@@ -7,10 +7,10 @@ and that refuse a vocabulary which does not hold up.
 The site is one static deployment: an Astro application, with a Blazor WebAssembly
 playground mounted under `/playground/`. There is no application server.
 
-> **Status: the pipeline, the theme catalogue and the narrative are built.** The home page
-> carries its three acts, every theme the library ships or carries has a page measured by the
-> engine, and the playground boots in a browser and draws from the published package. The
-> comparison page is specified and not yet built.
+> **Status: every route the specification names is built.** The home page carries its three
+> acts, the comparison answers in a minute and proves afterwards, every theme has a page
+> measured by the engine, and the playground boots in a browser and draws from the published
+> package.
 
 ## The specification
 
@@ -60,6 +60,31 @@ then downgrade a whole act — applied deliberately. Act one is never downgraded
 Act three reads a theme that is refused on purpose, which is the one exception the
 specification names. The generator fails if that file is ever *accepted*, so the exception is
 enforced from the other side rather than by lowering the rule.
+
+## The comparison
+
+`/why-slugger` compares slugger with a list you wrote yourself, an opaque identifier,
+Docker's names generator and Haikunator — the first two because most teams are choosing
+between those rather than between libraries.
+
+**It concludes, then proves.** A matrix of ten axes does not read in a minute: it asks a
+reader to learn ten criteria and apply them themselves. So the three questions an
+already-equipped reader has are answered before the first criterion, and the apparatus comes
+last.
+
+The data is a structured file, and **the teaching of each axis is part of it**: the types
+refuse an axis without a plain-language label, the concrete question it settles and a short
+explanation, so a criterion nobody was taught does not compile. Three renderings read that
+one file.
+
+Every claim about a third-party tool was read in its own repository or registry entry, and
+the page shows those links. On uniqueness the page says an opaque identifier is the right
+answer and slugger is not — a comparison that cannot say that is not believed when it says
+anything else.
+
+`scripts/check-comparison.mjs` runs in the build: it fails on a note that points at a
+position another rendering does not keep, or on a comparative superlative, and warns once
+the last-checked date is older than the page declares.
 
 ## The theme catalogue
 

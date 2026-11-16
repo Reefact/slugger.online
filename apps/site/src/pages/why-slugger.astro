@@ -1,0 +1,246 @@
+---
+import Base from '../layouts/Base.astro';
+import {
+    axes,
+    freshnessDays,
+    options,
+    rightOfReply,
+    verdictWording,
+    verifiedOn,
+} from '../comparison';
+
+const slugger = options.find((option) => option.id === 'slugger')!;
+const others = options.filter((option) => option.id !== 'slugger');
+---
+
+<Base
+    title="Why slugger — slugger"
+    description="What slugger does that other name generators do not, what they do that it does not, and how to decide in a minute."
+>
+    <!--
+      §11.3 — THE PAGE CONCLUDES, THEN PROVES. A matrix of ten axes does not read in a
+      minute: it asks a reader to learn ten criteria and then apply them themselves. So the
+      three questions §4 gives a reader who is already equipped are answered before the first
+      criterion, and the apparatus comes after.
+
+      Four depths, and none is a prerequisite of the one before it.
+    -->
+    <section class="shell depth" id="the-problem">
+        <p class="act-mark">The problem</p>
+        <h1>Why slugger</h1>
+        <div class="prose">
+            <p>
+                Name generators draw an adjective from a flat list, where anything goes with
+                anything. <strong>slugger lets a noun declare what it is</strong>, so a word only
+                reaches a noun it can actually describe — and the vocabulary is a file you write
+                rather than a list somebody compiled into a program.
+            </p>
+        </div>
+
+        <!-- The three questions of §4, answered in a line each, before any criterion. -->
+        <dl class="answers">
+            <div>
+                <dt>Does it replace what I use?</dt>
+                <dd>
+                    No. It answers a case a flat list does not: names where a wrong pair would be
+                    noticed. If yours never are, you do not need this.
+                </dd>
+            </div>
+            <div>
+                <dt>What does mine not do?</dt>
+                <dd>
+                    It cannot stop an adjective reaching a noun it makes no sense on, and it
+                    cannot tell you your word list has a hole in it.
+                </dd>
+            </div>
+            <div>
+                <dt>Can I try it on one thing?</dt>
+                <dd>
+                    Yes. One run, no migration, nothing removed — and you can start from the
+                    vocabulary you already have.
+                </dd>
+            </div>
+        </dl>
+    </section>
+
+    <!--
+      §11.6 — COEXISTENCE, EARLY BUT NOT FIRST. It answers an objection, and an objection
+      without desire does not exist yet: a reader who has not learnt what is being discussed
+      has nothing to object to.
+    -->
+    <section class="shell depth" id="the-need">
+        <p class="act-mark">The need</p>
+        <h2>Find yourself here first</h2>
+        <p class="prose">
+            Four situations, one per option. Comparing before recognising which one you are in
+            is how a comparison wastes a reader's minute.
+        </p>
+
+        <ul class="situations">
+            {
+                options.map((option) => (
+                    <li class={option.id === 'slugger' ? 'card situation situation--ours' : 'card situation'}>
+                        <p class="slot-name">{option.name}</p>
+                        <p class="prose situation-line">{option.situation}</p>
+                        <p class="state">{option.what}</p>
+                    </li>
+                ))
+            }
+        </ul>
+
+        <div class="prose">
+            <p>
+                <strong>Nothing here has to be removed for slugger to be used.</strong> It takes no
+                migration and introduces itself on one run. A project that keeps its current
+                generator can even borrow its vocabulary: two of the themes slugger ships do
+                exactly that, under the original licences, with attribution on the theme's page.
+            </p>
+        </div>
+    </section>
+
+    <!--
+      §11.4 — NO CRITERION IS SHOWN WITHOUT BEING TAUGHT. Each axis carries, in the data and
+      not in this template, a plain-language label, the question it settles, and a short
+      explanation. The verdicts are visible; the sentence behind each one folds, through a
+      native mechanism that opens from the keyboard and is seen without hovering — there is
+      no hover on a phone, and information put in a tooltip is information absent.
+    -->
+    <section class="shell depth" id="the-criteria">
+        <p class="act-mark">The criteria</p>
+        <h2>Ten questions, each one explained before it is used</h2>
+
+        {
+            axes.map((axis) => (
+                <article class="axis" id={`axis-${axis.id}`}>
+                    <h3>{axis.label}</h3>
+                    <p class="axis-question">{axis.question}</p>
+                    <p class="prose">{axis.explanation}</p>
+                    {axis.example && <p class="axis-example">{axis.example}</p>}
+                    {axis.term && (
+                        <p class="state">
+                            The term for it, if you meet it elsewhere: {axis.term}.
+                        </p>
+                    )}
+
+                    <ul class="verdicts">
+                        {options.map((option) => {
+                            const cell = axis.cells[option.id];
+
+                            return (
+                                <li>
+                                    <details>
+                                        <summary>
+                                            <span class="verdict-option">{option.name}</span>
+                                            {/* The wording carries it; §13.4 forbids the
+                                                treatment being the only thing that says it. */}
+                                            <span class={`verdict verdict--${cell.verdict}`}>
+                                                {verdictWording[cell.verdict]}
+                                            </span>
+                                        </summary>
+                                        <p class="prose">{cell.note}</p>
+                                    </details>
+                                </li>
+                            );
+                        })}
+                    </ul>
+                </article>
+            ))
+        }
+    </section>
+
+    <section class="shell depth" id="the-proof">
+        <p class="act-mark">The proof</p>
+        <h2>Everything at once</h2>
+
+        <p class="prose">
+            The same answers as above, in one table. It is last because reading it first means
+            learning ten criteria before knowing whether any of them is yours.
+        </p>
+
+        <table class="matrix">
+            <thead>
+                <tr>
+                    <th scope="col">Question</th>
+                    {options.map((option) => <th scope="col">{option.name}</th>)}
+                </tr>
+            </thead>
+            <tbody>
+                {
+                    axes.map((axis) => (
+                        <tr>
+                            <th scope="row">
+                                <a href={`#axis-${axis.id}`}>{axis.label}</a>
+                            </th>
+                            {options.map((option) => (
+                                <td class={`verdict--${axis.cells[option.id].verdict}`}>
+                                    {verdictWording[axis.cells[option.id].verdict]}
+                                </td>
+                            ))}
+                        </tr>
+                    ))
+                }
+            </tbody>
+        </table>
+
+        <h3>Where this comes from</h3>
+        <p class="prose">
+            Every claim above was read in the tool's own repository, documentation or registry
+            entry. Those are the links, so you can disagree with the source rather than with us.
+        </p>
+        <dl class="sources">
+            {
+                others
+                    .filter((option) => option.sources.length > 0)
+                    .map((option) => (
+                        <div>
+                            <dt>{option.name}</dt>
+                            <dd>
+                                <ul class="marks marks--open">
+                                    {option.sources.map((source) => (
+                                        <li>
+                                            <a href={source.href} rel="noopener">
+                                                {source.label}
+                                                <span class="visually-hidden"> (opens in a new tab)</span>
+                                            </a>
+                                        </li>
+                                    ))}
+                                </ul>
+                            </dd>
+                        </div>
+                    ))
+            }
+            <div>
+                <dt>{slugger.name}</dt>
+                <dd>
+                    <ul class="marks marks--open">
+                        {slugger.sources.map((source) => (
+                            <li>
+                                <a href={source.href} rel="noopener">
+                                    {source.label}
+                                    <span class="visually-hidden"> (opens in a new tab)</span>
+                                </a>
+                            </li>
+                        ))}
+                    </ul>
+                </dd>
+            </div>
+        </dl>
+
+        <!--
+          §11.7 — the last-checked date is content data, and the right of reply is VISIBLE on
+          the page. A comparison that publicly offers one is read quite differently from one
+          that does not.
+        -->
+        <p class="state">
+            Last checked against its sources on {verifiedOn}. The build warns once that is more
+            than {freshnessDays} days old.
+        </p>
+        <p class="prose">
+            <a href={rightOfReply} rel="noopener">
+                If this gets your tool wrong, tell us
+                <span class="visually-hidden"> (opens in a new tab)</span>
+            </a>
+            &mdash; corrections with a source are applied.
+        </p>
+    </section>
+</Base>

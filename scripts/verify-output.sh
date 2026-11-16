@@ -157,6 +157,47 @@ if [[ -s $narrative ]] && grep -q '"refusals"' "$narrative"; then ok; else
     bad "$narrative carries no refusal — act three has nothing to read"
 fi
 
+# §11 — THE COMPARISON. Read off the page, because what matters is what shipped.
+
+check "the comparison page is there (§11)"
+[[ -f dist/why-slugger/index.html ]] && ok || bad "dist/why-slugger/index.html missing"
+
+# §11.4 — no criterion is shown without being taught. Every axis must carry its question and
+# its explanation IN THE PAGE, not only in the data: a template that forgot to render one
+# would compile and publish a criterion nobody was taught.
+check "every axis carries its question in the page (§11.4)"
+if [[ -f dist/why-slugger/index.html ]]; then
+    declared="$(grep -oE "question: '" apps/site/src/comparison.ts | wc -l)"
+    rendered="$(grep -o 'class="axis-question"' dist/why-slugger/index.html | wc -l)"
+    [[ $declared -gt 0 && $declared -eq $rendered ]] && ok ||
+        bad "$declared axes declared, $rendered questions rendered"
+else bad "no comparison page"; fi
+
+check "every axis carries its explanation and its verdicts (§11.4)"
+if [[ -f dist/why-slugger/index.html ]]; then
+    axes="$(grep -o 'class="axis"' dist/why-slugger/index.html | wc -l)"
+    verdicts="$(grep -o 'class="verdict verdict--' dist/why-slugger/index.html | wc -l)"
+    # Read off the matrix's own header rather than guessed from the source: one column per
+    # option, plus the one that names the question.
+    columns="$(grep -o '<th scope="col">' dist/why-slugger/index.html | wc -l)"
+    options=$(( columns - 1 ))
+    [[ $axes -gt 0 && $verdicts -eq $(( axes * options )) ]] && ok ||
+        bad "$axes axes x $options options should be $(( axes * options )) verdicts, found $verdicts"
+else bad "no comparison page"; fi
+
+# §11.4 — what deepens may fold, but through a NATIVE mechanism that opens from the
+# keyboard. A div behind a script is neither.
+check "the folded notes use a native disclosure (§11.4)"
+grep -q '<details' dist/why-slugger/index.html 2>/dev/null && ok ||
+    bad "no <details> on the comparison page"
+
+# §11.7 — the right of reply is VISIBLE on the page, and the last-checked date with it.
+check "the right of reply and the date are on the page (§11.7)"
+if grep -q 'slugger.online/issues/1' dist/why-slugger/index.html 2>/dev/null &&
+   grep -qE 'Last checked against its sources on [0-9]{4}-[0-9]{2}-[0-9]{2}' dist/why-slugger/index.html; then
+    ok
+else bad "the invitation to correct us, or the date, is missing"; fi
+
 # §8.6 — one visual source. The playground is the side that will break this, so the check
 # looks there first: the token file must have crossed, and no component may carry a literal.
 check "the shared tokens crossed into the playground (§8.6)"

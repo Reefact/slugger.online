@@ -9,6 +9,9 @@ cd "$root"
 
 ./scripts/generate-content.sh
 
+# §11.7 — the comparison's editorial rules, and its freshness warning.
+node ./scripts/check-comparison.mjs
+
 echo "==> site"
 pnpm --filter @slugger/site build
 

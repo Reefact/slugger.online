@@ -557,3 +557,193 @@ section + section {
 .closing {
     padding-top: var(--space-8);
 }
+
+/*
+ * THE COMPARISON — §11.
+ *
+ * Four depths, and the page is read top to bottom: the conclusion, then the proof. The
+ * apparatus is last on purpose (§11.3), so nothing here tries to pull the matrix upward.
+ */
+
+.depth {
+    padding-block: var(--space-12);
+}
+
+.depth + .depth {
+    border-top: 1px solid var(--rule);
+}
+
+/* The three questions of §4, answered before any criterion. */
+.answers {
+    display: grid;
+    gap: var(--space-6);
+    margin-block: var(--space-8) 0;
+}
+
+.answers dt {
+    font-weight: var(--weight-strong);
+    color: var(--ink);
+}
+
+.answers dd {
+    margin: var(--space-2) 0 0;
+    max-width: var(--measure);
+    color: var(--ink-dim);
+}
+
+.situations {
+    display: grid;
+    gap: var(--space-4);
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 17rem), 1fr));
+    margin-block: var(--space-6);
+    list-style: none;
+    padding: 0;
+}
+
+.situation-line {
+    margin-block: var(--space-2);
+    color: var(--ink);
+}
+
+/* Ours is marked, because a reader should know which card is the one selling to them. */
+.situation--ours {
+    border-color: var(--rule-strong);
+}
+
+.axis {
+    margin-block: var(--space-12);
+}
+
+.axis h3 {
+    font-size: var(--text-lg);
+    margin: 0;
+}
+
+.axis-question {
+    max-width: var(--measure);
+    margin: var(--space-2) 0 var(--space-3);
+    color: var(--slug);
+    font-size: var(--text-lg);
+}
+
+.axis-example {
+    max-width: var(--measure);
+    font-family: var(--font-mono);
+    font-size: var(--text-sm);
+    color: var(--word);
+}
+
+/*
+ * §11.4's folding, done with the native element: it opens from the keyboard, it is seen
+ * without hovering, and it needs no script. The verdict stays visible whether it is open or
+ * shut — what folds is the sentence behind it, never the answer.
+ */
+.verdicts {
+    list-style: none;
+    margin: var(--space-6) 0 0;
+    padding: 0;
+    border-top: 1px solid var(--rule);
+}
+
+.verdicts > li {
+    border-bottom: 1px solid var(--rule);
+}
+
+.verdicts summary {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-2) var(--space-4);
+    align-items: baseline;
+    justify-content: space-between;
+    padding: var(--space-3) 0;
+    cursor: pointer;
+}
+
+.verdict-option {
+    color: var(--ink);
+}
+
+.verdicts summary + p {
+    margin-top: 0;
+    padding-bottom: var(--space-4);
+}
+
+.verdict {
+    font-family: var(--font-mono);
+    font-size: var(--text-xs);
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+}
+
+/*
+ * Four verdicts, four treatments — and the word is always there, so §13.4 holds. The green
+ * stays what it has always been on this site: something cleared a rule. Nothing here is a
+ * failure, so nothing here is coral.
+ */
+.verdict--designed-for-it {
+    color: var(--passes);
+}
+
+.verdict--possible {
+    color: var(--word);
+}
+
+.verdict--not-offered {
+    color: var(--ink-faint);
+}
+
+.verdict--beside-the-point {
+    color: var(--state);
+}
+
+.matrix {
+    width: 100%;
+    margin-block: var(--space-6);
+    border-collapse: collapse;
+    font-size: var(--text-xs);
+    display: block;
+    overflow-x: auto;
+}
+
+.matrix th,
+.matrix td {
+    padding: var(--space-2) var(--space-3);
+    border-bottom: 1px solid var(--rule);
+    text-align: left;
+    vertical-align: top;
+}
+
+.matrix thead th {
+    border-bottom-color: var(--rule-strong);
+    color: var(--ink-faint);
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    white-space: nowrap;
+}
+
+.matrix tbody th {
+    font-weight: var(--weight-normal);
+    min-width: 14rem;
+}
+
+.matrix td {
+    font-family: var(--font-mono);
+    white-space: nowrap;
+}
+
+.sources {
+    display: grid;
+    gap: var(--space-4);
+    margin-block: var(--space-6);
+}
+
+.sources dt {
+    font-size: var(--text-xs);
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--ink-faint);
+}
+
+.sources dd {
+    margin: var(--space-1) 0 0;
+}
