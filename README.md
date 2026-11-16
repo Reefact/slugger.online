@@ -229,14 +229,36 @@ separately as `Slugger`.
 
 ## Deploying
 
+> **Nothing has been deployed.** There is no Cloudflare account attached to this repository
+> yet, so the account steps are written from the configuration they drive rather than from
+> having been run. The build, the artefact and the local runtime are verified; the rest is
+> waiting on a first publish.
+
 ```bash
 pnpm serve      # serve dist/ the way Workers will, parsing _headers and _redirects
+pnpm preview    # upload a version without promoting it
 pnpm run deploy # publish dist/ as built — it does not rebuild, so build first
 ```
 
 `pnpm serve` is not a static file server: it is the Workers runtime locally, so the response
 headers and the redirect rules are the real ones. Prefer it over any other local server when
 checking anything that depends on them.
+
+**A branch never publishes.** What publishes is a `release/*` tag on a commit that is on
+`main`, and `scripts/check-release-tag.sh` refuses anything else before the build starts. The
+workflow then runs the same scripts a maintainer runs and hands the host a directory already
+built and already verified.
+
+Afterwards, `scripts/check-deployment.sh <origin> [tag]` asks the live site the things no
+build can answer — whether the headers file took effect, which release is live, whether the
+WebAssembly resources are compressed in transit, whether the playground's runtime is
+revalidated. It prints `not settled` rather than `ok` for anything it cannot exercise, and
+says what would make that check real; those lines are the point of it. The browser suite can
+be pointed at the deployment too, with `PLAYWRIGHT_BASE_URL`.
+
+Step by step, with a check after every step:
+[`docs/for-maintainers/deployment.md`](docs/for-maintainers/deployment.md). Read step 7
+before turning strict transport on.
 
 ## Licence
 

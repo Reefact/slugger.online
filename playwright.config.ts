@@ -21,8 +21,12 @@ export default defineConfig({
     retries: 0,
     reporter: process.env.CI ? 'github' : 'list',
 
+    // Against the deployment when PLAYWRIGHT_BASE_URL names one, and against `dist/` served
+    // locally otherwise. The same checks either way: §12.5 lists things only a real
+    // deployment settles, and pointing this suite at it is how they get settled rather than
+    // assumed.
     use: {
-        baseURL: 'http://127.0.0.1:8788',
+        baseURL: process.env.PLAYWRIGHT_BASE_URL ?? 'http://127.0.0.1:8788',
         trace: 'retain-on-failure',
 
         /**
@@ -38,7 +42,8 @@ export default defineConfig({
 
     projects: [{ name: 'chromium', use: { ...devices['Desktop Chrome'] } }],
 
-    webServer: {
+    // Not started when the suite is pointed at a deployment: there is nothing to serve.
+    webServer: process.env.PLAYWRIGHT_BASE_URL ? undefined : {
         command: 'pnpm exec wrangler dev --port 8788',
         url: 'http://127.0.0.1:8788/',
         reuseExistingServer: !process.env.CI,

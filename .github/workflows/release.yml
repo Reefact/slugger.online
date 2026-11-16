@@ -1,0 +1,75 @@
+# A release/* TAG publishes. A branch never does — §12.4.
+#
+# It runs the same scripts a maintainer runs, and it publishes a directory that is already
+# built and already verified: the host receives bytes that passed, never a build it performs
+# itself.
+name: release
+
+on:
+  push:
+    tags: ['release/*']
+  workflow_dispatch:
+    inputs:
+      rehearse:
+        description: 'Build and verify without publishing'
+        type: boolean
+        default: true
+
+permissions:
+  contents: read
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    environment: production
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          # check-release-tag.sh needs main to decide whether the tag is on it.
+          fetch-depth: 0
+
+      # Before anything is built, because a tag that must not publish should cost nothing
+      # but a red check.
+      - if: startsWith(github.ref, 'refs/tags/')
+        run: ./scripts/check-release-tag.sh
+
+      - uses: actions/setup-dotnet@v4
+        with:
+          global-json-file: global.json
+
+      - uses: pnpm/action-setup@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: .nvmrc
+          cache: pnpm
+
+      - run: pnpm install --frozen-lockfile
+
+      - run: pnpm build
+        env:
+          # §13.1 — strict transport is opt-in, and this is the deployment that has checked
+          # the custom domain actually serves. Turning it on before that locks visitors out
+          # for the lifetime of the max-age.
+          PUBLIC_HSTS: ${{ vars.PUBLIC_HSTS }}
+          RELEASE_TAG: ${{ github.ref_name }}
+
+      - run: pnpm check
+
+      # The published artefact, rendered. The only thing that catches the class of defect
+      # that exists only after trimming (§10.8), and the only thing that can say whether the
+      # content policy lets the playground start (§13.2).
+      - run: pnpm test:browser
+
+      - name: Publish
+        if: startsWith(github.ref, 'refs/tags/') && inputs.rehearse != true
+        run: pnpm run deploy
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+
+      # §12.5 — the four things only a real deployment settles. Running them here means a
+      # release that broke one of them is red rather than discovered by a visitor.
+      - name: Check the deployment
+        if: startsWith(github.ref, 'refs/tags/') && inputs.rehearse != true
+        run: ./scripts/check-deployment.sh "${{ vars.SITE_ORIGIN }}" "${{ github.ref_name }}"

@@ -26,8 +26,11 @@ echo "==> version stamp"
 mkdir -p apps/site/public
 commit="$(git rev-parse HEAD 2>/dev/null || echo unknown)"
 built="$(date -u +%Y-%m-%dT%H:%M:%SZ)"
+# RELEASE_TAG is set by the release workflow and empty everywhere else, so a local build
+# says plainly that it is not a release rather than claiming to be one.
 cat > apps/site/public/version.json <<JSON
 {
+  "release": "${RELEASE_TAG:-none}",
   "commit": "$commit",
   "built": "$built",
   "themes": "$tag"
