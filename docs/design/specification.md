@@ -981,30 +981,43 @@ Exécuter du JavaScript saisi par le visiteur, compiler du code libre, effectuer
 réseau arbitraire, accéder au système de fichiers au-delà du fichier que le visiteur ouvre
 lui-même, ou persister une saisie ailleurs que dans le navigateur.
 
-### 10.4 Ce que le playground demande à la bibliothèque
+### 10.4 La formulation est à la bibliothèque, la mise en page est au site
 
-Le moteur sépare les faits de la prose : il rend des données, et c'est la ligne de commande
-qui écrit les phrases. C'est une bonne séparation, et le playground est exactement le
-second consommateur qu'elle prévoyait.
+Le moteur sépare les faits de la prose, et le playground est le second consommateur que
+cette séparation prévoyait. D'où la règle, qui est l'une des plus importantes de ce
+document :
 
-Il en découle **deux exigences adressées à la bibliothèque**, et elles sont écrites ici
-pour être satisfaites plutôt que découvertes :
+**Le site ne réécrit jamais une seconde formulation d'un refus ni d'une mesure.** Une
+seconde formulation dérive de la première au premier correctif, et elle dérive en
+silence — les deux textes restent plausibles, et rien ne les compare. Un auteur de thème
+s'entendrait alors dire deux choses différentes par le même produit.
 
-- **la formulation d'un refus doit être atteignable par un autre rendu que le CLI.**
-  Aujourd'hui une seule formulation existe, ce qui est précisément la qualité à préserver :
-  un refus lu dans le playground et le même refus lu dans un terminal doivent être le même
-  texte ;
-- **le modèle de la mesure doit être publiable.** Le rapport est calculé par le moteur et
-  mis en forme par son consommateur ; un consommateur écrit en .NET qui n'atteint pas le
-  modèle ne peut pas le mettre en forme.
+La règle ne suffit pas seule, parce qu'un refus n'est pas qu'une phrase : c'est une phrase
+**dans une présentation**. La ligne à tenir est donc celle-ci.
 
-**La règle que ces exigences servent : le site ne réécrit jamais une seconde formulation
-d'un refus ni d'une mesure.** Une seconde formulation dérive de la première au premier
-correctif, et elle dérive en silence — les deux textes restent plausibles, et rien ne les
-compare.
+**Ce qui est à la bibliothèque : la phrase de chaque raison**, et son code. Le site les
+affiche tels quels, mot pour mot. Un refus lu dans le playground et le même refus lu dans
+un terminal disent la même chose.
 
-Tant qu'une exigence n'est pas satisfaite, c'est §7.3 qui s'applique : la route ne publie
-pas ce qu'elle ne peut pas rendre fidèlement. Elle ne publie pas une approximation.
+**Ce qui est au site : la mise en page.** Le titre d'un rapport, l'ordre, le regroupement,
+ce qui se replie, ce qui s'abrège quand les raisons sont nombreuses. Une page met une liste
+en page à sa façon, et la façon d'un terminal n'est pas la sienne — reproduire la règle
+d'abrègement d'un terminal serait imiter une contrainte d'écran que le site n'a pas.
+
+**Et ce qui n'est à personne des deux : un conseil qui nomme une option de ligne de
+commande.** Un terminal a le droit de dire quel drapeau corriger, parce que son lecteur
+vient d'en taper un. Une page n'a pas ce droit : son lecteur n'a peut-être rien installé,
+et c'est précisément ce que §10.2 lui promet. Le site écarte donc ces phrases plutôt que de
+les traduire en gestes d'interface, et §16 porte le contrôle.
+
+La même ligne vaut pour la mesure : les nombres viennent du moteur, leur présentation est au
+site (§7.6), et aucun n'est recalculé ici (§14.2).
+
+**Quand le site a besoin d'une mesure que la bibliothèque garde pour elle, il la demande.**
+Il ne la calcule pas, et il ne s'en passe pas en silence. Une mesure de plus est une version
+mineure chez la source ; une mesure recalculée ici est une divergence définitive. Tant
+qu'elle n'est pas publiée, c'est §7.3 qui s'applique : la route ne publie pas ce qu'elle ne
+peut pas rendre fidèlement, et elle attend plutôt que d'approximer.
 
 ### 10.5 Pourquoi il n'y a pas de catalogue généré
 
@@ -1498,6 +1511,7 @@ transformés en contrôles ; il est aussi la liste de ce qu'on saura *ne pas* av
 | Aucun thème publié n'est refusé par la validation | 14.4 | Chargement en intégration continue, règles ordinaires |
 | Les options du playground et celles du CLI sont la même liste | 10.5 | Confrontation en intégration continue à la déclaration de la ligne de commande |
 | Le site ne porte aucune seconde formulation d'un refus ou d'une mesure | 10.4 | Vérification des chaînes : aucune ne reproduit un message du moteur |
+| Aucune phrase affichée ne nomme une option de ligne de commande comme un conseil | 10.4 | Vérification des chaînes, contre la déclaration de la ligne de commande |
 | Une commande copiable proposée pour ce qui n'est pas installable | 5.7 | Échec de build |
 | Une commande d'installation qui tait la préversion d'un paquet qui en est une | 5.7, 7.4 | Échec de build |
 | La route d'un thème est indexée sur son nom de fichier, jamais sur son intitulé | 7.6 | Vérification de l'artefact |
