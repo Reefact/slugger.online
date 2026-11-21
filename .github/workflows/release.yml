@@ -33,6 +33,20 @@ jobs:
       - if: startsWith(github.ref, 'refs/tags/')
         run: ./scripts/check-release-tag.sh
 
+      # Before the build, because a wrong token should cost a few seconds rather than be
+      # discovered at `wrangler deploy` five minutes later. A rehearsal checks them too —
+      # otherwise nothing does, since a rehearsal stops before the step that would use them.
+      - name: Verify the Cloudflare credentials
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+        run: |
+          if [ "${{ startsWith(github.ref, 'refs/tags/') && inputs.rehearse != true }}" = "true" ]; then
+            ./scripts/check-credentials.sh publishing
+          else
+            ./scripts/check-credentials.sh rehearsing
+          fi
+
       - uses: actions/setup-dotnet@v4
         with:
           global-json-file: global.json
