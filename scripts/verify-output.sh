@@ -251,7 +251,7 @@ else bad "the invitation to correct us, or the date, is missing"; fi
 # artefact; this one proves every page still asks for them. The two failures it is for: a
 # layout that loses a link in a refactor, and the playground drifting away from the site it
 # claims to be part of (§8.6). Both look fine in a diff and wrong in a tab.
-check "every page carries the library's mark (§8.5, §8.6)"
+check "every page carries the library's mark (§8.5 and 8.6)"
 unmarked=""
 while IFS= read -r page; do
     for rel in 'href="/favicon.ico"' 'href="/favicon.svg"' 'href="/apple-touch-icon.png"'; do
