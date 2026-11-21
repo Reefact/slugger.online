@@ -247,6 +247,26 @@ if grep -q 'slugger.online/issues/1' dist/why-slugger/index.html 2>/dev/null &&
     ok
 else bad "the invitation to correct us, or the date, is missing"; fi
 
+# §8.5 — the mark. The reference check above already proves the three files are in the
+# artefact; this one proves every page still asks for them. The two failures it is for: a
+# layout that loses a link in a refactor, and the playground drifting away from the site it
+# claims to be part of (§8.6). Both look fine in a diff and wrong in a tab.
+check "every page carries the library's mark (§8.5, §8.6)"
+unmarked=""
+while IFS= read -r page; do
+    for rel in 'href="/favicon.ico"' 'href="/favicon.svg"' 'href="/apple-touch-icon.png"'; do
+        grep -qF "$rel" "$page" || unmarked="${unmarked}${page} -> ${rel}"$'\n'
+    done
+done < <(find dist -name '*.html' -type f)
+if [[ -z $unmarked ]]; then ok; else bad "$unmarked"; fi
+
+# The mark is mirrored, never drawn here (§8.5). A file that stopped being the library's
+# would still be a valid icon and would still pass every check above it, so the one thing
+# worth asserting is that nothing in the repository supplies it.
+check "the mark is mirrored, not committed (§8.5)"
+committed="$(git ls-files 'apps/site/public/favicon.*' 'apps/site/public/apple-touch-icon.*' 2>/dev/null || true)"
+if [[ -z $committed ]]; then ok; else bad "committed instead of mirrored: $committed"; fi
+
 # §8.6 — one visual source. The playground is the side that will break this, so the check
 # looks there first: the token file must have crossed, and no component may carry a literal.
 check "the shared tokens crossed into the playground (§8.6)"

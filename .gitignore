@@ -7,6 +7,13 @@ apps/site/src/generated/
 tools/catalogue/mirrored/
 apps/site/public/version.json
 
+# The library's mark, mirrored by scripts/fetch-icon.sh at the pin (§8.5). Committing it
+# would create a second copy that nothing keeps in step with the package's own.
+apps/site/public/favicon.ico
+apps/site/public/favicon.svg
+apps/site/public/apple-touch-icon.png
+apps/site/.icon-tag
+
 node_modules/
 .astro/
 

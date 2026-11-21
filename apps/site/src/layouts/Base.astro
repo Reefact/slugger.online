@@ -26,6 +26,16 @@ const canCopy = command.state === 'published';
         <title>{title}</title>
         <meta name="description" content={description} />
         <link rel="canonical" href={new URL(Astro.url.pathname, Astro.site)} />
+        <!--
+          The mark is the library's, mirrored at the pin by scripts/fetch-icon.sh (§8.5) —
+          two drawings, not one. The .svg and the small sizes inside the .ico carry the
+          glove the library simplified for 16 to 32 px; the touch icon carries the detailed
+          one, which is never shown small. `sizes="any"` on the .ico is what makes a browser
+          that understands SVG prefer the SVG rather than take the .ico as the better match.
+        -->
+        <link rel="icon" href="/favicon.ico" sizes="any" />
+        <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+        <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
     </head>
     <body>
         <a class="skip-link" href="#main">Skip to content</a>

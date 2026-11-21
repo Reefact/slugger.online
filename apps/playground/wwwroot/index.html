@@ -11,6 +11,15 @@
           scripts/verify-output.sh asserts the pair (§12.2).
         -->
         <base href="/playground/" />
+        <!--
+          §8.6 — the playground is a page of the same product, and the tab is the one place
+          a visitor sees that claim tested. These paths are absolute on purpose: a relative
+          one would resolve against the base above and look for the mark inside
+          /playground/, where it is not.
+        -->
+        <link rel="icon" href="/favicon.ico" sizes="any" />
+        <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+        <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
         <link rel="stylesheet" href="css/tokens.css" />
         <link rel="stylesheet" href="css/app.css" />
     </head>

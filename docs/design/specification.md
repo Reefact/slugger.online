@@ -739,6 +739,25 @@ Le slug affiché sur l'image de partage est produit au build comme les autres (�
 image qui montrerait un slug écrit à la main serait la seule surface du site à mentir, et
 la plus partagée.
 
+**Le symbole n'est pas dessiné ici.** La librairie en a déjà un : c'est l'icône NuGet des
+deux paquets et le `.ico` de la commande. Un lecteur qui croise slugger sur NuGet, dans un
+terminal et sur ce site doit y rencontrer le même gant ; en dessiner un second ferait du
+site la source d'une chose qu'il ne possède pas (§2). Il le **reflète** donc, au tag que
+`themes.pin` déclare, comme il reflète les thèmes (§7.5), et rien de ce qui est reflété
+n'est commité.
+
+La librairie a par ailleurs déjà tranché ce que §8.5 exige de plus difficile : elle ship
+**deux dessins**, et dit lequel sert à quelle taille. `icon.svg` porte les sillons, les
+reflets et les coutures ; `icon-small.svg` est le même gant débarrassé de ce détail, parce
+qu'à 16 px — ses mots — le dessin complet est « une tache brune avec un point rose ». Le web
+a trois emplacements, et la répartition suit cette règle plutôt que notre goût : l'onglet
+reçoit le dessin simplifié, l'icône tactile le dessin détaillé, le `.ico` les deux. Aucun
+n'est rastérisé ici : la marque ne peut pas diverger entre le paquet et le site par le
+chemin d'un moteur de rendu qui serait le nôtre.
+
+Restent à faire, et §5.7 interdit de les laisser traîner à moitié : la déclinaison
+monochrome et le gabarit d'image de partage.
+
 ### 8.6 Une seule source visuelle pour les deux moitiés
 
 Le site et le playground sont deux applications, dans deux technologies, construites par
