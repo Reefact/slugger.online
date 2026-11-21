@@ -161,6 +161,20 @@ Domains & Routes. Cloudflare issues the certificate.
 API token's zone policy named it when it was created — so Cloudflare issued the certificate
 without anything further being asked. The site answered 200 immediately afterwards.
 
+**Observed from a browser, and worth knowing before you panic.** The site answered at once
+from outside, while the machine that had tried `slugger.online` before the domain was
+attached went on answering `DNS_PROBE_FINISHED_NXDOMAIN` for a good while after. Nothing was
+wrong with the deployment. A resolver is allowed to remember that a name does not exist, and
+for how long is the last field of the zone's `SOA` record — `1800` here, so thirty minutes
+from whenever it asked. Two of those caches are yours to clear: `ipconfig /flushdns` on
+Windows, and Chrome's own, at `chrome://net-internals/#dns`. The one at your ISP is not, so
+the test that tells you where the stale answer lives is a phone with wifi off. Read the
+records rather than guess — `curl -s 'https://dns.google/resolve?name=slugger.online&type=A'`
+answers from the public side, and if the `A` and `NS` records are there, the deployment is
+fine and the wait is the whole of the problem. Change nothing in Cloudflare during those
+thirty minutes: there is nothing there to fix, and a change made blind is what turns a wait
+into an outage.
+
 Then set the `SITE_ORIGIN` repository variable, so the workflow checks the deployment from
 the next release onward.
 
@@ -177,6 +191,12 @@ opt-in, why it is step 7 rather than step 2, and why the only deployment that tu
 one that has checked.
 
 **Check.** `curl -sI https://slugger.online/ | grep -i strict-transport` names it.
+
+**Observed on the second release.** `release/2026-11-21.1` published with both variables set.
+The workflow's `Check the deployment` step ran against the live site and passed — which is
+the only proof that `SITE_ORIGIN` is set, since the step says nothing when it is missing — and
+the header came back as `max-age=31536000; includeSubDomains`. From that release on, every
+publish checks itself.
 
 ## 8. After the next release
 
