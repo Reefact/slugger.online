@@ -128,3 +128,68 @@ button {
 #blazor-error-ui .reload {
     color: var(--ink);
 }
+
+/*
+    The two pickers — §10.2's first use. Colours and spaces come from the token file and
+    nowhere else (§8.6): the playground is the side that drifts, so there is nothing to drift
+    with here.
+*/
+.picker {
+    margin-bottom: var(--space-12);
+}
+
+.picker > .prose {
+    margin-bottom: var(--space-4);
+}
+
+.choices {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-2) var(--space-4);
+}
+
+.choice {
+    display: flex;
+    gap: var(--space-2);
+    align-items: baseline;
+    font-family: var(--font-mono);
+    font-size: var(--text-sm);
+}
+
+.option {
+    display: grid;
+    gap: var(--space-1);
+    padding: var(--space-3) 0;
+    border-top: 1px solid var(--rule);
+}
+
+.option code {
+    font-family: var(--font-mono);
+    font-size: var(--text-sm);
+}
+
+.option input[type="text"],
+.option input[type="number"] {
+    font-family: var(--font-mono);
+    font-size: var(--text-sm);
+    color: var(--ink);
+    background: var(--surface-raised);
+    border: 1px solid var(--rule-strong);
+    border-radius: var(--radius-sm);
+    padding: var(--space-1) var(--space-2);
+    max-width: 12ch;
+}
+
+.note {
+    color: var(--ink-dim);
+    font-size: var(--text-xs);
+}
+
+/* A refusal is the engine's sentence, shown where the slug would have been (§5.7). */
+.refusal {
+    font-family: var(--font-mono);
+    font-size: var(--text-sm);
+    color: var(--refused);
+    max-width: var(--measure);
+    margin-bottom: var(--space-6);
+}

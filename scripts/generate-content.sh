@@ -16,6 +16,9 @@ tag="$(grep -vE '^\s*(#|$)' themes.pin | head -1 | tr -d '[:space:]')"
 # §8.5 — the mark, mirrored rather than drawn, at the same pin.
 ./scripts/fetch-icon.sh
 
+# §10.5 — the draw options the command line offers, taken from it rather than typed twice.
+./scripts/fetch-options.sh
+
 echo "==> catalogue: measurements and slugs, from the engine"
 dotnet run --project tools/catalogue/Catalogue.csproj -c Release -- \
     tools/catalogue/mirrored "$tag" apps/site/src/generated/catalogue.json

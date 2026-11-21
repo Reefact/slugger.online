@@ -1078,6 +1078,25 @@ commande a gagné des options dans les semaines qui ont suivi la rédaction de c
 Le contrôle qui compare les deux listes est donc une condition de publication de la route,
 pas une amélioration ultérieure.
 
+**Ce qui compte comme option de tirage**, parce qu'un contrôle sur une liste qu'on peut
+discuter ne contrôle rien. La règle est mécanique et ne se maintient pas à la main : *une
+propriété de `SluggerSettings` dont le nom est aussi une propriété de `GenerationOptions`*.
+La ligne de commande expose exactement un drapeau par option que le moteur déclare, donc
+l'intersection **est** la liste — douze sur les trente arguments que la commande accepte.
+Tout le reste est une commande (`--init`, `--register`, `--analyze`), une affaire de sortie
+(`--count`, `--oneshot`, `--clipboard`) ou réclame un système de fichiers que le navigateur
+n'a pas (`--theme-dir`), que §10.3 refuse de toute façon.
+
+Deux propriétés en découlent, et il faut les distinguer parce qu'elles ne couvrent pas le
+même risque. Le pont nomme chaque option par `nameof`, donc une option **renommée** ne
+compile plus — c'est la moitié que le typage ferme tout seul. Une option **ajoutée** ne
+produit rien du tout, et c'est exactement ce que §10.5 décrit ; c'est le contrôle qui la
+ferme, en comparant la liste reprise de la bibliothèque au pin à celle que le pont traite.
+
+Enfin, **la formulation de chaque option voyage avec elle** : le libellé affiché est le
+`[Description]` que la commande imprime dans son `--help`. Un libellé écrit ici serait le
+site expliquant la bibliothèque dans ses propres mots, ce que §10.4 interdit.
+
 ### 10.6 Le thème du visiteur ne quitte jamais son navigateur
 
 Un fichier ouvert dans le playground n'est envoyé nulle part, n'est enregistré nulle part,

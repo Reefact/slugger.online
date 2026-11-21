@@ -1,3 +1,5 @@
+@inject HttpClient Http
+
 @*
     THE WHOLE APPLICATION, with no router and no layout component — and that is a trimming
     decision as much as a simplicity one (§10.8).
@@ -23,61 +25,217 @@
         <p class="slot-name">Drawn in your browser, by the engine itself</p>
         <p class="slug" data-slug>@_slug</p>
 
+        @*
+            §5.7 — a refusal is said, never swallowed. The text is the engine's own: the site
+            decides where it sits and nothing more (§10.4).
+        *@
+        @if (_refusal is not null)
+        {
+            <p class="refusal" role="status" data-refusal>@_refusal</p>
+        }
+
         <div class="controls">
-            <label>
-                <span class="slot-name">Theme</span>
-                <select @bind="_theme" @bind:after="Draw">
-                    @foreach (string name in Themes)
-                    {
-                        <option value="@name">@name</option>
-                    }
-                </select>
-            </label>
-
-            <label>
-                <span class="slot-name">Casing</span>
-                <select @bind="_casing" @bind:after="Draw">
-                    @foreach (Casing casing in Casings)
-                    {
-                        <option value="@casing">@casing</option>
-                    }
-                </select>
-            </label>
-
-            <button type="button" @onclick="Draw">Draw another</button>
+            <button type="button" @onclick="Draw" disabled="@(_chosen.Count == 0)">Draw another</button>
         </div>
 
+        <section class="picker" aria-labelledby="themes-heading">
+            <h2 class="slot-name" id="themes-heading">Themes</h2>
+            <p class="prose">
+                The catalogue's themes, at the tag this site was built from. Pick more than one
+                and the engine draws from all of them at once, exactly as
+                <code>--theme</code> repeated does.
+            </p>
+
+            <div class="choices">
+                @foreach (CatalogueTheme theme in _catalogue)
+                {
+                    <label class="choice">
+                        <input type="checkbox"
+                               checked="@_chosen.Contains(theme.Name)"
+                               @onchange="@(e => ChooseTheme(theme.Name, e.Value is true))" />
+                        <span>@theme.Name</span>
+                    </label>
+                }
+            </div>
+        </section>
+
+        <section class="picker" aria-labelledby="options-heading">
+            <h2 class="slot-name" id="options-heading">Options</h2>
+            <p class="prose">
+                The options the command line offers, and the same list (§10.5). An option is off
+                until you turn it on, as a flag is until you type it; what it does is the
+                command's own description of it.
+            </p>
+
+            @foreach (DrawOption option in _options)
+            {
+                bool on = _set.ContainsKey(option.Property);
+
+                <div class="option">
+                    <label class="choice">
+                        <input type="checkbox"
+                               checked="@on"
+                               @onchange="@(e => Toggle(option, e.Value is true))" />
+                        <code>@option.Template</code>
+                    </label>
+
+                    @if (on && option.Type is not "bool")
+                    {
+                        IReadOnlyList<string> values = DrawOptions.ValuesOf(option.Type);
+
+                        @if (values.Count > 0)
+                        {
+                            <select value="@_set[option.Property]"
+                                    @onchange="@(e => SetValue(option, e.Value?.ToString() ?? string.Empty))">
+                                @foreach (string value in values)
+                                {
+                                    <option value="@value">@value</option>
+                                }
+                            </select>
+                        }
+                        else
+                        {
+                            <input type="@(option.Type.StartsWith("int", StringComparison.Ordinal) ? "number" : "text")"
+                                   value="@_set[option.Property]"
+                                   @onchange="@(e => SetValue(option, e.Value?.ToString() ?? string.Empty))" />
+                        }
+                    }
+
+                    <p class="prose note">@option.Description</p>
+                </div>
+            }
+        </section>
+
         <p class="prose">
-            <strong>@_combinations.ToString("N0")</strong> distinct names are reachable with
-            these options. Nothing you choose here leaves your browser, and there is no second
-            generator: the engine on this page is the one the command runs.
+            @if (_combinations > 0)
+            {
+                <strong>@_combinations.ToString("N0")</strong>
+                @: distinct names are reachable with these options.
+            }
+            Nothing you choose here leaves your browser, and there is no second generator: the
+            engine on this page is the one the command runs.
         </p>
     </main>
 </div>
 
 @code {
 
-    // The engine's own list, never one typed here: a theme added to the package appears
-    // without this file changing (§2).
-    private static readonly IReadOnlyList<string> Themes = SluggerTheme.EmbeddedNames;
+    private readonly List<CatalogueTheme> _catalogue = [];
+    private readonly List<DrawOption> _options = [];
 
-    private static readonly Casing[] Casings = Enum.GetValues<Casing>();
+    // The themes chosen, and the options turned on with the text their control holds. Absence is
+    // how an option says "not given", which is what a command line means by not typing a flag.
+    private readonly HashSet<string> _chosen = [];
+    private readonly Dictionary<string, string> _set = [];
 
-    private string _theme = Themes[0];
-    private Casing _casing = Casing.Kebab;
+    // A theme is parsed once. A repository theme costs a fetch and a parse; neither belongs in a
+    // redraw, which should be the engine's work and nothing else.
+    private readonly Dictionary<string, SluggerTheme> _loaded = [];
+
     private string _slug = string.Empty;
+    private string? _refusal;
     private long _combinations;
 
-    protected override void OnInitialized() {
-        Draw();
+    protected override async Task OnInitializedAsync() {
+        try {
+            CatalogueTheme[] themes = await Http.GetFromJsonAsync("themes/index.json", PlaygroundJson.Default.CatalogueThemeArray)
+                                   ?? [];
+            DrawOptionsFile? options = await Http.GetFromJsonAsync("options.json", PlaygroundJson.Default.DrawOptionsFile);
+
+            _catalogue.AddRange(themes);
+            _options.AddRange(options?.Options ?? []);
+        } catch (Exception failure) {
+            _refusal = $"The catalogue did not load: {failure.Message}";
+
+            return;
+        }
+
+        // The theme the command line draws from when none is named, so the page opens on what
+        // `slugger` alone would have given.
+        CatalogueTheme? first = _catalogue.FirstOrDefault(theme => theme.Name == "slugger") ?? _catalogue.FirstOrDefault();
+        if (first is not null) {
+            _chosen.Add(first.Name);
+            await DrawAsync();
+        }
+    }
+
+    private async Task ChooseTheme(string name, bool chosen) {
+        if (chosen) { _chosen.Add(name); } else { _chosen.Remove(name); }
+
+        await DrawAsync();
+    }
+
+    private async Task Toggle(DrawOption option, bool on) {
+        if (on) {
+            _set[option.Property] = DrawOptions.ValuesOf(option.Type) is [string first, ..] ? first : string.Empty;
+        } else {
+            _set.Remove(option.Property);
+        }
+
+        await DrawAsync();
+    }
+
+    private async Task SetValue(DrawOption option, string value) {
+        _set[option.Property] = value;
+
+        await DrawAsync();
     }
 
     private void Draw() {
-        SluggerTheme theme = SluggerTheme.LoadEmbeddedOrThrow(_theme);
-        SlugGenerator generator = SlugGenerator.ForOrThrow(theme, options => options with { Casing = _casing });
+        _ = DrawAsync();
+    }
 
-        _combinations = generator.Combinations;
-        _slug = generator.Next();
+    private async Task DrawAsync() {
+        _refusal = null;
+        _slug = string.Empty;
+        _combinations = 0;
+
+        if (_chosen.Count == 0) {
+            _refusal = "Choose at least one theme.";
+
+            return;
+        }
+
+        try {
+            List<SluggerTheme> themes = [];
+            foreach (string name in _catalogue.Where(theme => _chosen.Contains(theme.Name)).Select(theme => theme.Name)) {
+                themes.Add(await LoadAsync(name));
+            }
+
+            GenerationOptions options = GenerationOptions.Default;
+            foreach ((string property, string value) in _set) {
+                options = DrawOptions.Apply(options, property, value);
+            }
+
+            SlugGenerator generator = SlugGenerator.ForOrThrow(themes, _ => options);
+
+            _combinations = generator.Combinations;
+            _slug = generator.Next();
+        } catch (Exception refused) {
+            // The engine refuses a combination the controls can express — a segment mode a theme
+            // cannot serve, a length no word fits under. Its own sentence says which, and it is
+            // the sentence a reader would have got from the command (§10.4).
+            _refusal = refused.Message;
+        }
+
+        StateHasChanged();
+    }
+
+    private async Task<SluggerTheme> LoadAsync(string name) {
+        if (_loaded.TryGetValue(name, out SluggerTheme? already)) { return already; }
+
+        CatalogueTheme entry = _catalogue.First(theme => theme.Name == name);
+
+        // An embedded theme travels inside the package; a repository one was published beside this
+        // application by the build. Both end in the same call, which is the one the visitor's own
+        // file will take in turn (§10.2).
+        SluggerTheme theme = entry.Origin is "embedded"
+            ? SluggerTheme.LoadEmbeddedOrThrow(name)
+            : SluggerTheme.LoadFromJsonOrThrow(await Http.GetStringAsync($"themes/{name}.json"), name);
+
+        _loaded[name] = theme;
+
+        return theme;
     }
 
 }
