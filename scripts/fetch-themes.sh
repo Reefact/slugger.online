@@ -26,6 +26,16 @@ if [[ -f $stamp && "$(cat "$stamp")" == "$tag" && -n "$(find "$out" -name '*.jso
     exit 0
 fi
 
+# `gh` is authenticated differently everywhere: by a login locally, by GH_TOKEN in
+# Actions, and by nothing at all on a fresh machine. Saying so here costs one call and
+# saves reading a build log to find gh's own notice at the bottom of it.
+if ! gh api "repos/Reefact/slugger" --jq '.full_name' > /dev/null 2>&1; then
+    echo "fetch-themes: gh cannot reach the GitHub API." >&2
+    echo "  In GitHub Actions, give the step: env: { GH_TOKEN: \${{ github.token }} }." >&2
+    echo "  Locally, run: gh auth login" >&2
+    exit 1
+fi
+
 echo "==> mirroring themes at $tag"
 rm -rf "$out"
 mkdir -p "$out"

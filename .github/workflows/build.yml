@@ -36,11 +36,19 @@ jobs:
       # The warning ratchet is scoped to CI, so the local inner loop stays friendly. The
       # playground's project file reads GITHUB_ACTIONS for the same reason.
       - run: pnpm build
+        env:
+          # scripts/fetch-themes.sh mirrors the library's themes through the GitHub API,
+          # and `gh` has no credential of its own on a runner.
+          GH_TOKEN: ${{ github.token }}
 
       - run: pnpm check
 
       # The published artefact, rendered. It is the only thing that catches the class of
       # defect that exists only after trimming - §10.8.
+      # No browser on a fresh runner, and the suite is the only thing that can say the
+      # content policy lets the playground start (§13.2).
+      - run: pnpm exec playwright install --with-deps chromium
+
       - run: pnpm test:browser
 
       - uses: actions/upload-artifact@v4

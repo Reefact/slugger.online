@@ -48,6 +48,9 @@ jobs:
 
       - run: pnpm build
         env:
+          # scripts/fetch-themes.sh mirrors the library's themes through the GitHub API,
+          # and `gh` has no credential of its own on a runner.
+          GH_TOKEN: ${{ github.token }}
           # §13.1 — strict transport is opt-in, and this is the deployment that has checked
           # the custom domain actually serves. Turning it on before that locks visitors out
           # for the lifetime of the max-age.
@@ -59,6 +62,10 @@ jobs:
       # The published artefact, rendered. The only thing that catches the class of defect
       # that exists only after trimming (§10.8), and the only thing that can say whether the
       # content policy lets the playground start (§13.2).
+      # No browser on a fresh runner, and the suite is the only thing that can say the
+      # content policy lets the playground start (§13.2).
+      - run: pnpm exec playwright install --with-deps chromium
+
       - run: pnpm test:browser
 
       - name: Publish
