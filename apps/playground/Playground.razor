@@ -186,12 +186,16 @@
     }
 
     private async Task DrawAsync() {
+        // The slug is NOT blanked here. A redraw replaces one value with another, and an empty
+        // frame between them is a flicker to a reader and nothing at all to a test reading the
+        // moment after a click. It is cleared only where there is genuinely nothing to show.
         _refusal = null;
-        _slug = string.Empty;
-        _combinations = 0;
 
         if (_chosen.Count == 0) {
+            _slug = string.Empty;
+            _combinations = 0;
             _refusal = "Choose at least one theme.";
+            StateHasChanged();
 
             return;
         }
@@ -215,6 +219,8 @@
             // The engine refuses a combination the controls can express — a segment mode a theme
             // cannot serve, a length no word fits under. Its own sentence says which, and it is
             // the sentence a reader would have got from the command (§10.4).
+            _slug = string.Empty;
+            _combinations = 0;
             _refusal = refused.Message;
         }
 

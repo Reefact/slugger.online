@@ -33,20 +33,52 @@ test('the playground boots and draws a slug from the real engine', async ({ page
     expect(seen.size).toBeGreaterThan(1);
 });
 
-test('the engine offers the themes it ships, and the slug follows the casing asked for', async ({ page }) => {
+/**
+ * §10.2 asks for the CATALOGUE's themes, not the three the package embeds, and the ones it
+ * does not embed arrive as published files fetched at run time. Nothing in the artefact can
+ * say whether that fetch happens and whether the engine accepts what comes back: a file
+ * served as the wrong type, a policy that refuses the request, a theme the parser rejects
+ * all publish, all load, and all draw nothing. Only a rendered page says it.
+ */
+test('a theme the package does not embed is fetched and drawn, and an option changes the slug', async ({ page }) => {
     await page.goto('/playground/');
     await expect(page.locator('[data-slug]')).not.toBeEmpty({ timeout: 90_000 });
 
-    // The list comes from the engine (SluggerTheme.EmbeddedNames), so this asserts that it
-    // arrived rather than which names are in it — the names are the library's fact, not
-    // this repository's (§2).
-    const themes = page.getByLabel('Theme');
-    await expect(themes.locator('option')).not.toHaveCount(0);
+    const themes = page.getByRole('region', { name: 'Themes' });
 
-    await page.getByLabel('Casing').selectOption('Snake');
+    // Which themes exist is the library's fact, not this repository's (§2), so the one to
+    // exercise is read from the manifest the build published rather than written here.
+    const manifest: { name: string; origin: string }[] = await page.evaluate(() =>
+        fetch('themes/index.json').then(response => response.json()),
+    );
+
+    const mirrored = manifest.find(theme => theme.origin !== 'embedded');
+    const embedded = manifest.find(theme => theme.origin === 'embedded');
+
+    expect(mirrored, 'the catalogue holds a theme the package does not embed').toBeTruthy();
+    expect(embedded, 'the catalogue holds a theme the package embeds').toBeTruthy();
+    await expect(themes.getByRole('checkbox')).toHaveCount(manifest.length);
+
+    // Everything off but the repository theme, so the draw that follows can only have come
+    // through the fetch and SluggerTheme.LoadFromJson.
+    for (const theme of manifest) {
+        await themes.getByRole('checkbox', { name: theme.name, exact: true })
+            .setChecked(theme.name === mirrored!.name);
+    }
+
+    await expect(page.locator('[data-refusal]')).toHaveCount(0);
+    await expect(page.locator('[data-slug]')).not.toBeEmpty();
+
+    // An option is off until it is turned on, as a flag is until it is typed (§10.5). The
+    // label is the command's own template, so matching on the flag is matching on what the
+    // library wrote.
+    const options = page.getByRole('region', { name: 'Options' });
+
+    await options.getByRole('checkbox', { name: '--casing' }).check();
+    await options.getByRole('combobox').selectOption('Snake');
     await expect(page.locator('[data-slug]')).toContainText('_');
 
-    await page.getByLabel('Casing').selectOption('Kebab');
+    await options.getByRole('combobox').selectOption('Kebab');
     await expect(page.locator('[data-slug]')).toContainText('-');
 });
 
