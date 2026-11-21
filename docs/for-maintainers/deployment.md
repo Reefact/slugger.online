@@ -6,10 +6,10 @@ goes wrong here is silent, and the step that reveals it is rarely the step that 
 This guide is in English, like everything in this repository except the design documents
 under `docs/design/`.
 
-> **Nothing in this guide has been run against a real Cloudflare account yet.** The build,
-> the artefact and the local runtime are verified; the account steps are written from the
-> configuration they drive and are the part that needs a first deployment to confirm. Where
-> something can only be settled there, it says so.
+> **First run: 2026-11-21, tag `release/2026-11-21`.** These steps have been followed against
+> a real account, and what they produced is recorded in them. One thing is still marked as
+> unsettled, in step 3, and it is unsettled because it was never exercised rather than
+> because it failed.
 
 ## 0. Before anything
 
@@ -75,9 +75,11 @@ pnpm preview       # uploads a version without promoting it
 **Check.** `wrangler versions upload` prints a preview URL, and that URL serves the home
 page.
 
-> **§12.5 — to settle here, once:** whether a preview URL is unique per upload, whether it
-> stays stable while that version exists, and how long it is retained. Write what you
-> observe into this step; nothing in the repository can answer it.
+> **§12.5 — still unsettled, and honestly so.** Whether a preview URL is unique per upload,
+> whether it stays stable while that version exists, and how long it is retained: the first
+> deployment went straight from the secrets to the tag, so `pnpm preview` was never run and
+> none of it was observed. Nothing in the repository can answer it. The first person to need
+> a preview settles it here.
 
 ## 4. Publishing
 
@@ -89,8 +91,25 @@ git checkout main && git pull
 git tag release/2026-11-16 && git push origin release/2026-11-16
 ```
 
-**Check.** The `release` workflow goes green, and its last step —
-`scripts/check-deployment.sh` — passes.
+**Check.** The `release` workflow goes green.
+
+**Observed on the first run.** `wrangler` uploaded 77 files and reported:
+
+```
+Uploaded slugger-online (4.14 sec)
+No targets deployed for slugger-online (0.35 sec)
+Current Version ID: 0763c223-68e7-46c1-90fa-cc921996904b
+```
+
+`No targets deployed` is the expected answer here, not a warning: `workers_dev` is off and no
+domain is attached yet, so the Worker exists and answers on nothing. Step 6 gives it an
+address.
+
+The run's last step is skipped at this point, and says why — the `SITE_ORIGIN` variable does
+not exist yet. That is also expected; it is set in step 6.
+
+GitHub masks the account id in the logs of its own accord, since it is a secret. It appears
+as `***`.
 
 ## 5. What the deployment is checked for
 
@@ -113,6 +132,17 @@ asks the live origin the things no build can answer (§12.5):
 It prints `not settled` rather than `ok` for anything it cannot exercise, and says what would
 make the check real. Read those lines; they are the point of the script.
 
+**Observed on the first run**, against the live site: every check above passed, and one came
+back `not settled` — the order between serving an asset and applying a rewrite rule. The
+playground declares no client-side route, so `_redirects` carries no rule and there is
+nothing to exercise. A check that passed there would be reporting on an absence.
+
+The browser suite was also pointed at the deployment, and all of it passed. Two results are
+worth recording because they had only ever been reasoned about before: **the playground boots
+in production, through to a slug, with no content-policy violation at all** — on the narrow
+`'wasm-unsafe-eval'` allowance alone — and the negative control passes too, so the policy is
+being enforced rather than merely sent.
+
 You can also point the browser suite at the deployment:
 
 ```bash
@@ -126,6 +156,10 @@ Domains & Routes. Cloudflare issues the certificate.
 
 **Check.** `curl -sI https://slugger.online/ | head -1` answers `HTTP/2 200`, and
 `./scripts/check-deployment.sh https://slugger.online` passes.
+
+**Observed on the first run.** The zone already existed in the account — it had to, since the
+API token's zone policy named it when it was created — so Cloudflare issued the certificate
+without anything further being asked. The site answered 200 immediately afterwards.
 
 Then set the `SITE_ORIGIN` repository variable, so the workflow checks the deployment from
 the next release onward.

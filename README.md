@@ -7,10 +7,11 @@ and that refuse a vocabulary which does not hold up.
 The site is one static deployment: an Astro application, with a Blazor WebAssembly
 playground mounted under `/playground/`. There is no application server.
 
-> **Status: every route the specification names is built.** The home page carries its three
-> acts, the comparison answers in a minute and proves afterwards, every theme has a page
-> measured by the engine, and the playground boots in a browser and draws from the published
-> package.
+> **Live at [slugger.online](https://slugger.online) since 2026-11-21.** Every route the
+> specification names is built: the home page carries its three acts, the comparison answers
+> in a minute and proves afterwards, every theme has a page measured by the engine, and the
+> playground runs the published engine in the browser. The browser suite passes against the
+> deployment, not only against `dist/`.
 
 ## The specification
 
@@ -229,10 +230,8 @@ separately as `Slugger`.
 
 ## Deploying
 
-> **Nothing has been deployed.** There is no Cloudflare account attached to this repository
-> yet, so the account steps are written from the configuration they drive rather than from
-> having been run. The build, the artefact and the local runtime are verified; the rest is
-> waiting on a first publish.
+The guide's steps have been followed against a real account, and what each one produced is
+recorded in it.
 
 ```bash
 pnpm serve      # serve dist/ the way Workers will, parsing _headers and _redirects
@@ -259,6 +258,17 @@ be pointed at the deployment too, with `PLAYWRIGHT_BASE_URL`.
 Step by step, with a check after every step:
 [`docs/for-maintainers/deployment.md`](docs/for-maintainers/deployment.md). Read step 7
 before turning strict transport on.
+
+**What the first deployment settled**, which no build could: the headers file takes effect,
+header by header; the WebAssembly resources are compressed in transit; the playground's
+runtime is revalidated rather than held; and the playground boots in production through to a
+slug with no content-policy violation, on the narrow `'wasm-unsafe-eval'` allowance alone —
+with the negative control passing too, so the policy is enforced and not merely sent.
+
+**What it did not settle**, and says so rather than passing quietly: the order between
+serving an asset and applying a rewrite rule, because the playground declares no client-side
+route and `_redirects` therefore carries no rule to exercise. And preview URLs, because the
+first deployment went straight from the secrets to the tag and never used one.
 
 ## Licence
 
