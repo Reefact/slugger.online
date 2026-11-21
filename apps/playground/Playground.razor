@@ -23,7 +23,7 @@
 
     <main id="main">
         <p class="slot-name">Drawn in your browser, by the engine itself</p>
-        <p class="slug" data-slug>@_slug</p>
+        <p class="slug @Fitting" data-slug>@_slug</p>
 
         @*
             §5.7 — a refusal is said, never swallowed. The text is the engine's own: the site
@@ -131,6 +131,16 @@
     // A theme is parsed once. A repository theme costs a fetch and a parse; neither belongs in a
     // redraw, which should be the engine's work and nothing else.
     private readonly Dictionary<string, SluggerTheme> _loaded = [];
+
+    // A slug has no space in it, and an underscore gives a browser no place to break a line,
+    // so a long one breaks mid-letter at a display size — the one thing a name must never do
+    // to a reader. The size steps down with the length. It is layout and nothing else: the
+    // text stays exactly what the engine drew (§14.3).
+    private string? Fitting => _slug.Length switch {
+        > 34 => "slug--small",
+        > 22 => "slug--medium",
+        _    => null
+    };
 
     private string _slug = string.Empty;
     private string? _refusal;

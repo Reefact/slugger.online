@@ -193,3 +193,21 @@ button {
     max-width: var(--measure);
     margin-bottom: var(--space-6);
 }
+
+/* See Playground.razor: the display size holds a short slug, not a four-word one. */
+.slug--medium {
+    font-size: var(--text-xl);
+}
+
+.slug--small {
+    font-size: var(--text-lg);
+}
+
+/*
+    The browser's own blue is the one colour on this page that comes from neither the token
+    file nor the baseball of §8.1. accent-color is the only property that reaches inside a
+    control a browser draws itself.
+*/
+.choice input[type="checkbox"] {
+    accent-color: var(--slug);
+}
