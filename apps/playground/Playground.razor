@@ -152,7 +152,9 @@
                     thing the engine does better than this page is say why a text is not a theme
                     — including when it is empty (§5.7, §10.4).
                 *@
-                <button type="button" @onclick="Measure">Measure this theme</button>
+                <button type="button" @onclick="Measure" aria-busy="@_measuring">
+                    @(_measuring ? "Measuring…" : "Measure this theme")
+                </button>
             </div>
 
             @if (_analysis is { } analysis)
@@ -326,6 +328,7 @@
     private ThemeWaiver? _waiver;
     private CatalogueTheme? _opened;
     private ThemeAnalysis? _analysis;
+    private bool _measuring;
 
     private string _slug = string.Empty;
     private string? _refusal;
@@ -413,20 +416,37 @@
     private async Task MeasureAsync() {
         string name = string.IsNullOrWhiteSpace(_fileName) ? "your theme" : _fileName;
 
-        _analysis = SluggerTheme.AnalyzeFromJson(_json, name, _waived);
+        // Measuring a large theme takes seconds of this one thread, and a button that does
+        // nothing for that long has told its reader the click was lost (§5.7). The yield is what
+        // lets the state below reach the screen before the engine takes the thread back.
+        _measuring = true;
+        StateHasChanged();
+        await Task.Yield();
 
-        if (_opened is not null) {
-            _chosen.Remove(_opened.Name);
-            _loaded.Remove(_opened.Name);
-        }
+        try {
+            _analysis = SluggerTheme.AnalyzeFromJson(_json, name, _waived);
 
-        _opened = null;
+            if (_opened is not null) {
+                _chosen.Remove(_opened.Name);
+                _loaded.Remove(_opened.Name);
+            }
 
-        Outcome<SluggerTheme> loaded = SluggerTheme.LoadFromJson(_json, name, _waived);
-        if (loaded.Error is null) {
-            _opened = new CatalogueTheme(name, "opened");
-            _loaded[name] = loaded.GetResultOrThrow();
-            _chosen.Add(name);
+            _opened = null;
+
+            // Only when the analysis accepted it. Loading parses the whole theme a second time —
+            // seconds, for a theme of any size — and a theme the analysis refused cannot load
+            // anyway, so that second parse would buy an error we have already been given, in
+            // better words.
+            if (_analysis.IsAccepted) {
+                Outcome<SluggerTheme> loaded = SluggerTheme.LoadFromJson(_json, name, _waived);
+                if (loaded.Error is null) {
+                    _opened = new CatalogueTheme(name, "opened");
+                    _loaded[name] = loaded.GetResultOrThrow();
+                    _chosen.Add(name);
+                }
+            }
+        } finally {
+            _measuring = false;
         }
 
         await DrawAsync();

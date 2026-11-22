@@ -99,7 +99,16 @@ test('a theme the visitor opens is refused with its reasons, measured, and drawn
     const yours = page.getByRole('region', { name: 'Your theme' });
     const hasty = readFileSync('apps/site/src/themes/hasty.json', 'utf8');
 
-    await yours.locator('textarea').fill(hasty);
+    // Pasted, not typed. A theme runs to hundreds of kilobytes, and driving that through the
+    // input pipeline a character at a time takes minutes and exercises nothing: what a reader
+    // does is put the text in and leave the field, which is these two lines.
+    const paste = (text: string) =>
+        yours.locator('textarea').evaluate((node: HTMLTextAreaElement, value: string) => {
+            node.value = value;
+            node.dispatchEvent(new Event('change', { bubbles: true }));
+        }, text);
+
+    await paste(hasty);
     await yours.getByRole('button', { name: 'Measure this theme' }).click();
 
     await expect(page.locator('[data-verdict]')).toContainText('refused');
@@ -130,8 +139,8 @@ test('a theme the visitor opens is refused with its reasons, measured, and drawn
     // A theme that does load is drawn without leaving the page (§10.2). Taken from the
     // artefact rather than written here: a theme invented for a test is still an invented
     // theme (§5.6).
-    await yours.locator('textarea').fill(readFileSync('dist/playground/themes/iceland.json', 'utf8'));
-    await yours.getByRole('button', { name: 'Measure this theme' }).click();
+    await paste(readFileSync('dist/playground/themes/cocktails.json', 'utf8'));
+    await yours.getByRole('button', { name: 'Measure' }).click();
 
     await expect(page.locator('[data-verdict]')).toContainText('accepted');
     await expect(page.locator('[data-slug]')).not.toBeEmpty();
