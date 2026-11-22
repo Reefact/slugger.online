@@ -126,9 +126,16 @@
                 </label>
             </div>
 
+            @*
+                Bound on change rather than on input. A theme is tens of thousands of words, and
+                re-rendering this page on every keystroke of a paste that size is work nobody
+                asked for — it also fights whatever is doing the pasting, which is how this was
+                found. Clicking the button blurs the field, so the text is committed before it
+                is read.
+            *@
             <textarea class="theme-input" rows="6" spellcheck="false"
                       placeholder="{ &quot;nouns&quot;: [...], &quot;adjectives&quot;: [...] }"
-                      @bind="_json" @bind:event="oninput"></textarea>
+                      @bind="_json"></textarea>
 
             @if (_waiver is not null)
             {
@@ -140,9 +147,12 @@
             }
 
             <div class="controls">
-                <button type="button" @onclick="Measure" disabled="@string.IsNullOrWhiteSpace(_json)">
-                    Measure this theme
-                </button>
+                @*
+                    Never disabled. A button that cannot be pressed explains nothing, and the one
+                    thing the engine does better than this page is say why a text is not a theme
+                    — including when it is empty (§5.7, §10.4).
+                *@
+                <button type="button" @onclick="Measure">Measure this theme</button>
             </div>
 
             @if (_analysis is { } analysis)
