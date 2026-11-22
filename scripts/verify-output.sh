@@ -294,7 +294,14 @@ bridge="apps/playground/DrawOptions.cs"
 # the same nameof() it dispatches on, and a comment must not be able to satisfy a check.
 declared="$(grep -E '=>\s*options with' "$bridge" |
     grep -oE 'nameof\(GenerationOptions\.[A-Za-z]+\)' | sed -E 's/.*\.([A-Za-z]+)\)/\1/' | sort -u)"
-offered="$(grep -oE '"property": "[A-Za-z]+"' dist/playground/options.json | sed -E 's/.*: "(.*)"/\1/' | sort -u)"
+# Read, not scraped: the file carries one other property key — the waiver of §10.2, which
+# shapes no draw and must not be in this list. A grep for the key would count it and fail the
+# check for being right.
+offered="$(python3 -I -c '
+import io, json
+with io.open("dist/playground/options.json", encoding="utf-8") as f:
+    print("\n".join(sorted(option["property"] for option in json.load(f)["options"])))
+')"
 if [[ -z $offered ]]; then
     bad "dist/playground/options.json names no option"
 elif [[ "$declared" != "$offered" ]]; then
