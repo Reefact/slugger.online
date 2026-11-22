@@ -116,18 +116,24 @@ test('a theme the visitor opens is refused with its reasons, measured, and drawn
     // Measured even while refused: an author wants to know by how much, not only that.
     await expect(page.locator('.margins tbody tr').first()).toBeVisible();
 
-    // And the floors lift for a file still being written, which is the state this one is in.
+    // The floors lift for a file still being written, and that is all they lift. This theme is
+    // refused for its size AND for naming a category it does not declare; waiving the first
+    // must not whitewash the second, or the waiver would be telling an author their file is
+    // further along than it is.
+    const counted = await reasons.count();
+
     await yours.getByRole('checkbox', { name: '--allow-small-theme' }).check();
-    await expect(page.locator('[data-verdict]')).toContainText('waived');
+    await expect(reasons).not.toHaveCount(counted);
+    expect(await reasons.count()).toBeLessThan(counted);
+    await expect(page.locator('[data-verdict]')).toContainText('refused');
 
-    // A theme just measured is drawn without leaving the page (§10.2).
-    const themes = page.getByRole('region', { name: 'Themes' });
-    for (const other of await themes.getByRole('checkbox').all()) {
-        if (!(await other.evaluate(node => (node as HTMLInputElement).labels?.[0]?.innerText.includes('hasty')))) {
-            await other.uncheck();
-        }
-    }
+    // A theme that does load is drawn without leaving the page (§10.2). Taken from the
+    // artefact rather than written here: a theme invented for a test is still an invented
+    // theme (§5.6).
+    await yours.locator('textarea').fill(readFileSync('dist/playground/themes/iceland.json', 'utf8'));
+    await yours.getByRole('button', { name: 'Measure this theme' }).click();
 
+    await expect(page.locator('[data-verdict]')).toContainText('accepted');
     await expect(page.locator('[data-slug]')).not.toBeEmpty();
     await expect(page.locator('[data-refusal]')).toHaveCount(0);
 });

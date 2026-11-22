@@ -279,7 +279,13 @@
 
     // The catalogue, and the one file the visitor opened. One at a time: an author is trying THEIR
     // theme, and a second slot would turn a workbench into a library.
-    private IEnumerable<CatalogueTheme> Available => _opened is null ? _catalogue : _catalogue.Append(_opened);
+    private IEnumerable<CatalogueTheme> Available =>
+        _opened is null
+            ? _catalogue
+            // A file named after a catalogue theme would otherwise be offered twice under one
+            // name, and the engine would be handed whichever was found first. The author's own
+            // file wins: it is the one they came here to try.
+            : _catalogue.Where(theme => theme.Name != _opened.Name).Append(_opened);
 
     // The themes chosen, and the options turned on with the text their control holds. Absence is
     // how an option says "not given", which is what a command line means by not typing a flag.
