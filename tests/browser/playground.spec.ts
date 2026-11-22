@@ -1,3 +1,5 @@
+import { readFileSync } from 'node:fs';
+
 import { expect, test } from '@playwright/test';
 
 /**
@@ -80,6 +82,54 @@ test('a theme the package does not embed is fetched and drawn, and an option cha
 
     await options.getByRole('combobox').selectOption('Kebab');
     await expect(page.locator('[data-slug]')).toContainText('-');
+});
+
+/**
+ * §10.2's second use, and §4 calls its reader the best-served audience of this site. An
+ * author opens a file and is told, by the engine the command runs, every reason it would be
+ * refused — and is measured anyway, which is the case that matters.
+ *
+ * The theme used is the one §14.4 already keeps refused on purpose, so nothing is invented
+ * here and nothing has to stay refused by coincidence.
+ */
+test('a theme the visitor opens is refused with its reasons, measured, and drawn once waived', async ({ page }) => {
+    await page.goto('/playground/');
+    await expect(page.locator('[data-slug]')).not.toBeEmpty({ timeout: 90_000 });
+
+    const yours = page.getByRole('region', { name: 'Your theme' });
+    const hasty = readFileSync('apps/site/src/themes/hasty.json', 'utf8');
+
+    await yours.locator('textarea').fill(hasty);
+    await yours.getByRole('button', { name: 'Measure this theme' }).click();
+
+    await expect(page.locator('[data-verdict]')).toContainText('refused');
+
+    const reasons = page.locator('[data-reasons] li');
+    await expect(reasons.first()).toBeVisible();
+
+    // §10.4 — a terminal may say which flag to correct, because its reader has just typed
+    // one. A page may not: its reader may have installed nothing at all, which is exactly
+    // what §10.2 promises them. An em dash the library wrote must survive, so this looks for
+    // a flag and not for two hyphens.
+    expect(await page.locator('[data-reasons]').innerText()).not.toMatch(/--[a-z]/);
+
+    // Measured even while refused: an author wants to know by how much, not only that.
+    await expect(page.locator('.margins tbody tr').first()).toBeVisible();
+
+    // And the floors lift for a file still being written, which is the state this one is in.
+    await yours.getByRole('checkbox', { name: '--allow-small-theme' }).check();
+    await expect(page.locator('[data-verdict]')).toContainText('waived');
+
+    // A theme just measured is drawn without leaving the page (§10.2).
+    const themes = page.getByRole('region', { name: 'Themes' });
+    for (const other of await themes.getByRole('checkbox').all()) {
+        if (!(await other.evaluate(node => (node as HTMLInputElement).labels?.[0]?.innerText.includes('hasty')))) {
+            await other.uncheck();
+        }
+    }
+
+    await expect(page.locator('[data-slug]')).not.toBeEmpty();
+    await expect(page.locator('[data-refusal]')).toHaveCount(0);
 });
 
 test('the home page shows a slug without loading the .NET runtime', async ({ page }) => {

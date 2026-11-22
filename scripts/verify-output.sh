@@ -247,6 +247,40 @@ if grep -q 'slugger.online/issues/1' dist/why-slugger/index.html 2>/dev/null &&
     ok
 else bad "the invitation to correct us, or the date, is missing"; fi
 
+# §10.4 — the rule this document calls one of its most important: the site never carries a
+# SECOND wording of a refusal or a measurement. Two wordings drift apart at the first
+# correction and drift in silence, because both stay plausible and nothing compares them.
+# This is what compares them: every fixed sentence the engine's error model writes, taken at
+# the pin, against every component in this repository. A match is a copy.
+check "no second wording of anything the engine says (§10.4)"
+sentences="apps/site/src/generated/engine-sentences.txt"
+if [[ ! -s $sentences ]]; then
+    bad "$sentences is missing; run scripts/fetch-sentences.sh"
+else
+    copied="$(grep -rF -f "$sentences" apps/site/src apps/playground \
+        --include='*.astro' --include='*.razor' --include='*.ts' --include='*.cs' \
+        --exclude-dir=generated --exclude-dir=bin --exclude-dir=obj 2>/dev/null || true)"
+    if [[ -z $copied ]]; then ok; else bad "$copied"; fi
+fi
+
+# §10.4 — a sentence that names a command-line option is advice, and advice belongs to
+# neither side: a terminal may say which flag to correct because its reader has just typed
+# one; a page may not, because its reader may have installed nothing at all, which is exactly
+# what §10.2 promises them. Every refusal shown must therefore pass through the one place
+# that drops those sentences.
+check "every refusal shown is filtered of flag advice (§10.4)"
+unfiltered="$(grep -n 'DiagnosticMessage' apps/playground/*.razor 2>/dev/null | grep -v 'Reasons.Said' || true)"
+if [[ -z $unfiltered ]]; then ok; else bad "$unfiltered"; fi
+
+# §10.2 — the playground does not validate the MEANING of a theme and never claims to. The
+# phases of the protocol that find the most are human readings, and none of them automates. A
+# word like "valid" on this page would tell an author their theme is good where it says only
+# that the file holds together with what it declares.
+check "no control is presented as validating a theme's meaning (§10.2)"
+claims="$(grep -rniE '\b(valid|invalid|correct(ly)?|verified|approved|quality|score|rating)\b' \
+    apps/playground/Playground.razor 2>/dev/null || true)"
+if [[ -z $claims ]]; then ok; else bad "$claims"; fi
+
 # §10.5 — THE CONDITION OF PUBLISHING THE ROUTE, in that section's own words, not a later
 # improvement. The playground drives a fixed set of options: the command line's. A typed call
 # makes a RENAMED option a compilation error, which is why the bridge is one; it cannot make

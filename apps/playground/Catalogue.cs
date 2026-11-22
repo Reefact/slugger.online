@@ -30,8 +30,15 @@ internal sealed record CatalogueTheme(string Name, string Origin);
 /// <param name="Description">What <c>--help</c> says of it.</param>
 internal sealed record DrawOption(string Property, string Type, string Flag, string Template, string Description);
 
+/// <summary>
+///     The one option that shapes no draw: §10.2 asks for it so that an author can measure a file
+///     still being written. It judges the theme rather than joining the terms, so it is not in the
+///     list above and must not be.
+/// </summary>
+internal sealed record ThemeWaiver(string Property, string Flag, string Template, string Description);
+
 /// <param name="PinnedTag">The library tag this list was read at (§7.5).</param>
-internal sealed record DrawOptionsFile(string PinnedTag, DrawOption[] Options);
+internal sealed record DrawOptionsFile(string PinnedTag, DrawOption[] Options, ThemeWaiver? Waiver);
 
 /// <summary>
 ///     Source-generated serialisation. The reflection-based one would be trimmed away and warn

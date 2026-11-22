@@ -47,7 +47,7 @@
             </p>
 
             <div class="choices">
-                @foreach (CatalogueTheme theme in _catalogue)
+                @foreach (CatalogueTheme theme in Available)
                 {
                     <label class="choice">
                         <input type="checkbox"
@@ -106,6 +106,160 @@
             }
         </section>
 
+        @*
+            §10.2's SECOND USE, and §4 calls its reader the best-served audience of this site. It
+            takes from a theme's author the one step that forced them to install something before
+            knowing whether their work held up.
+        *@
+        <section class="picker" aria-labelledby="yours-heading">
+            <h2 class="slot-name" id="yours-heading">Your theme</h2>
+            <p class="prose">
+                Open a theme file, or paste one. It is read here, in this page: it is sent nowhere,
+                saved nowhere, and known to nobody. There is no server to send it to. For the same
+                reason a theme you opened cannot be shared by its address — sharing it would mean
+                transmitting it.
+            </p>
+
+            <div class="controls">
+                <label class="choice">
+                    <InputFile OnChange="OpenFile" accept=".json,application/json" />
+                </label>
+            </div>
+
+            <textarea class="theme-input" rows="6" spellcheck="false"
+                      placeholder="{ &quot;nouns&quot;: [...], &quot;adjectives&quot;: [...] }"
+                      @bind="_json" @bind:event="oninput"></textarea>
+
+            @if (_waiver is not null)
+            {
+                <label class="choice">
+                    <input type="checkbox" checked="@_waived" @onchange="@(e => Waive(e.Value is true))" />
+                    <code>@_waiver.Template</code>
+                </label>
+                <p class="prose note">@_waiver.Description</p>
+            }
+
+            <div class="controls">
+                <button type="button" @onclick="Measure" disabled="@string.IsNullOrWhiteSpace(_json)">
+                    Measure this theme
+                </button>
+            </div>
+
+            @if (_analysis is { } analysis)
+            {
+                <div class="report" data-report>
+                    @*
+                        The verdict, then the reasons, then the numbers. The order, the grouping and
+                        what folds are this page's business; every sentence inside them is the
+                        engine's, word for word (§10.4).
+                    *@
+                    <p class="verdict @(analysis.IsAccepted ? "verdict--accepted" : "verdict--refused")" data-verdict>
+                        @if (analysis.IsAccepted)
+                        {
+                            @(analysis.FloorsWaived
+                                ? $"\"{analysis.Name}\" is accepted with the size floors waived."
+                                : $"\"{analysis.Name}\" is accepted as it is.")
+                        }
+                        else
+                        {
+                            @($"\"{analysis.Name}\" would be refused.")
+                        }
+                    </p>
+
+                    @if (analysis.Refusals.Count > 0)
+                    {
+                        <ul class="reasons" data-reasons>
+                            @foreach (SluggerThemeError refusal in analysis.Refusals)
+                            {
+                                <li>
+                                    <code class="code">@refusal.Code</code>
+                                    <span>@Reasons.Said(refusal.DiagnosticMessage)</span>
+                                </li>
+                            }
+                        </ul>
+                    }
+
+                    @if (analysis.Remarks.Count > 0)
+                    {
+                        <ul class="reasons">
+                            @foreach (string remark in analysis.Remarks)
+                            {
+                                <li><span>@Reasons.Said(remark)</span></li>
+                            }
+                        </ul>
+                    }
+
+                    @if (analysis.Measurements is { } measured)
+                    {
+                        @*
+                            Measured even when the theme is refused, which is the case that matters:
+                            an author wants to know by how much, not only that.
+                        *@
+                        <dl class="measured">
+                            <dt>Combinations</dt>
+                            <dd>@measured.Combinations.ToString("N0")</dd>
+
+                            <dt>Longest slug</dt>
+                            <dd><code>@measured.LongestSlug</code></dd>
+
+                            <dt>Least exposed</dt>
+                            <dd><code>@measured.LeastExposed.Word</code> — @measured.LeastExposed.Nouns nouns</dd>
+
+                            <dt>Most exposed</dt>
+                            <dd><code>@measured.MostExposed.Word</code> — @measured.MostExposed.Nouns nouns</dd>
+
+                            @if (measured.DuplicatedNouns.Count > 0)
+                            {
+                                <dt>Duplicated nouns</dt>
+                                <dd>@string.Join(", ", measured.DuplicatedNouns)</dd>
+                            }
+
+                            @if (measured.UnreachableCategories.Count > 0)
+                            {
+                                <dt>Unreachable categories</dt>
+                                <dd>@string.Join(", ", measured.UnreachableCategories)</dd>
+                            }
+                        </dl>
+
+                        @if (measured.Margins.Count > 0)
+                        {
+                            <table class="margins">
+                                <thead>
+                                    <tr><th scope="col">Rule</th><th scope="col">Worst case</th><th scope="col">Limit</th><th scope="col">Subject</th></tr>
+                                </thead>
+                                <tbody>
+                                    @foreach (ThemeMargin margin in measured.Margins)
+                                    {
+                                        <tr class="@(margin.WorstCase < margin.Limit ? "margin--under" : null)">
+                                            <td>@margin.Rule</td>
+                                            <td>@margin.WorstCase.ToString("N0")</td>
+                                            <td>@margin.Limit.ToString("N0")</td>
+                                            <td>@margin.Subject@(margin.Beside is null ? null : $" beside {margin.Beside}")</td>
+                                        </tr>
+                                    }
+                                </tbody>
+                            </table>
+                        }
+                    }
+                    else
+                    {
+                        <p class="prose note">There is nothing to measure yet.</p>
+                    }
+
+                    @*
+                        §10.2 makes this limit a thing to write rather than leave to be guessed. The
+                        phases of the protocol that find the most are human readings, and none of
+                        them automates.
+                    *@
+                    <p class="prose note">
+                        This says whether the file holds together with what it declares. It does not
+                        say whether the theme reads well — that is a reading, and nothing here
+                        replaces it.
+                    </p>
+                </div>
+            }
+        </section>
+
         <p class="prose">
             @if (_combinations > 0)
             {
@@ -123,6 +277,10 @@
     private readonly List<CatalogueTheme> _catalogue = [];
     private readonly List<DrawOption> _options = [];
 
+    // The catalogue, and the one file the visitor opened. One at a time: an author is trying THEIR
+    // theme, and a second slot would turn a workbench into a library.
+    private IEnumerable<CatalogueTheme> Available => _opened is null ? _catalogue : _catalogue.Append(_opened);
+
     // The themes chosen, and the options turned on with the text their control holds. Absence is
     // how an option says "not given", which is what a command line means by not typing a flag.
     private readonly HashSet<string> _chosen = [];
@@ -136,11 +294,22 @@
     // so a long one breaks mid-letter at a display size — the one thing a name must never do
     // to a reader. The size steps down with the length. It is layout and nothing else: the
     // text stays exactly what the engine drew (§14.3).
+    private string _fileName = string.Empty;
+
     private string? Fitting => _slug.Length switch {
         > 34 => "slug--small",
         > 22 => "slug--medium",
         _    => null
     };
+
+    // The file the visitor opened: its text, what it is called, what the engine made of it, and
+    // whether the size floors were waived to judge it. None of it is sent anywhere — there is no
+    // server to send it to (§10.6, §12.3), which makes the promise structural rather than stated.
+    private string _json = string.Empty;
+    private bool _waived;
+    private ThemeWaiver? _waiver;
+    private CatalogueTheme? _opened;
+    private ThemeAnalysis? _analysis;
 
     private string _slug = string.Empty;
     private string? _refusal;
@@ -154,6 +323,7 @@
 
             _catalogue.AddRange(themes);
             _options.AddRange(options?.Options ?? []);
+            _waiver = options?.Waiver;
         } catch (Exception failure) {
             _refusal = $"The catalogue did not load: {failure.Message}";
 
@@ -195,6 +365,57 @@
         _ = DrawAsync();
     }
 
+    /// <summary>Reads the file the visitor chose, and measures it at once.</summary>
+    private async Task OpenFile(InputFileChangeEventArgs chosen) {
+        IBrowserFile file = chosen.File;
+
+        // A theme is words, not data: a megabyte is already far past any of them. The cap is what
+        // keeps a mistaken file from filling the tab rather than a judgement about themes.
+        using StreamReader reader = new(file.OpenReadStream(2 * 1024 * 1024));
+
+        _json = await reader.ReadToEndAsync();
+        _fileName = Path.GetFileNameWithoutExtension(file.Name);
+
+        await MeasureAsync();
+    }
+
+    private async Task Waive(bool waived) {
+        _waived = waived;
+
+        if (_analysis is not null) { await MeasureAsync(); }
+    }
+
+    private void Measure() {
+        _ = MeasureAsync();
+    }
+
+    /// <summary>
+    ///     The second use of §10.2, in one call: the engine judges and measures the same text the
+    ///     command would have judged, and never throws for the theme's sake. A theme that loads
+    ///     joins the list above, so one just measured is drawn without leaving the page.
+    /// </summary>
+    private async Task MeasureAsync() {
+        string name = string.IsNullOrWhiteSpace(_fileName) ? "your theme" : _fileName;
+
+        _analysis = SluggerTheme.AnalyzeFromJson(_json, name, _waived);
+
+        if (_opened is not null) {
+            _chosen.Remove(_opened.Name);
+            _loaded.Remove(_opened.Name);
+        }
+
+        _opened = null;
+
+        Outcome<SluggerTheme> loaded = SluggerTheme.LoadFromJson(_json, name, _waived);
+        if (loaded.Error is null) {
+            _opened = new CatalogueTheme(name, "opened");
+            _loaded[name] = loaded.GetResultOrThrow();
+            _chosen.Add(name);
+        }
+
+        await DrawAsync();
+    }
+
     private async Task DrawAsync() {
         // The slug is NOT blanked here. A redraw replaces one value with another, and an empty
         // frame between them is a flicker to a reader and nothing at all to a test reading the
@@ -212,7 +433,7 @@
 
         try {
             List<SluggerTheme> themes = [];
-            foreach (string name in _catalogue.Where(theme => _chosen.Contains(theme.Name)).Select(theme => theme.Name)) {
+            foreach (string name in Available.Where(theme => _chosen.Contains(theme.Name)).Select(theme => theme.Name)) {
                 themes.Add(await LoadAsync(name));
             }
 
@@ -240,7 +461,7 @@
     private async Task<SluggerTheme> LoadAsync(string name) {
         if (_loaded.TryGetValue(name, out SluggerTheme? already)) { return already; }
 
-        CatalogueTheme entry = _catalogue.First(theme => theme.Name == name);
+        CatalogueTheme entry = Available.First(theme => theme.Name == name);
 
         // An embedded theme travels inside the package; a repository one was published beside this
         // application by the build. Both end in the same call, which is the one the visitor's own

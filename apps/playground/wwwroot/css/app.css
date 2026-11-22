@@ -211,3 +211,104 @@ button {
 .choice input[type="checkbox"] {
     accent-color: var(--slug);
 }
+
+/*
+    §10.2's second use. The layout here is the site's and the sentences inside it are the
+    engine's (§10.4), which is why nothing below styles a sentence — only where it sits.
+*/
+.theme-input {
+    display: block;
+    width: 100%;
+    font-family: var(--font-mono);
+    font-size: var(--text-sm);
+    color: var(--ink);
+    background: var(--surface-raised);
+    border: 1px solid var(--rule-strong);
+    border-radius: var(--radius-sm);
+    padding: var(--space-2);
+    margin-bottom: var(--space-4);
+    resize: vertical;
+}
+
+.report {
+    border-top: 1px solid var(--rule-strong);
+    padding-top: var(--space-4);
+    margin-top: var(--space-4);
+}
+
+.verdict {
+    font-family: var(--font-mono);
+    font-size: var(--text-base);
+    margin-bottom: var(--space-4);
+}
+
+/* The green is bound to one role and keeps it: what passes a rule (§8.2). */
+.verdict--accepted {
+    color: var(--passes);
+}
+
+.verdict--refused {
+    color: var(--refused);
+}
+
+.reasons {
+    list-style: none;
+    padding: 0;
+    margin: 0 0 var(--space-6);
+    display: grid;
+    gap: var(--space-2);
+    max-width: var(--measure);
+}
+
+.reasons li {
+    display: grid;
+    gap: var(--space-1);
+    font-size: var(--text-sm);
+}
+
+.reasons .code {
+    font-family: var(--font-mono);
+    font-size: var(--text-xs);
+    color: var(--ink-faint);
+}
+
+.measured {
+    display: grid;
+    grid-template-columns: auto 1fr;
+    gap: var(--space-1) var(--space-4);
+    font-size: var(--text-sm);
+    margin: 0 0 var(--space-6);
+}
+
+.measured dt {
+    color: var(--ink-dim);
+}
+
+.measured dd {
+    margin: 0;
+    font-family: var(--font-mono);
+}
+
+.margins {
+    border-collapse: collapse;
+    font-size: var(--text-sm);
+    font-family: var(--font-mono);
+    margin-bottom: var(--space-6);
+}
+
+.margins th,
+.margins td {
+    text-align: left;
+    padding: var(--space-1) var(--space-4) var(--space-1) 0;
+    border-bottom: 1px solid var(--rule);
+}
+
+.margins th {
+    color: var(--ink-dim);
+    font-weight: var(--weight-medium);
+}
+
+/* A worst case under its limit is the one that costs the theme its acceptance. */
+.margin--under td {
+    color: var(--refused);
+}

@@ -102,8 +102,26 @@ if orphans:
     sys.exit('fetch-options: %s declared by GenerationOptions with no command-line flag at %s.'
              % (', '.join(orphans), tag))
 
+# §10.2 asks for one option that shapes no draw: the waiver that lets an author measure a
+# file still being written. It is not in the intersection above and must not be — it judges
+# the theme, it does not join the terms — so it travels on its own, with its own wording.
+WAIVER = 'AllowSmallTheme'
+if WAIVER not in flags:
+    sys.exit('fetch-options: the command line declares no %s at %s.' % (WAIVER, tag))
+
+waiver_template, waiver_description = flags[WAIVER]
+
 with io.open(out, 'w', encoding='utf-8') as f:
-    json.dump({'pinnedTag': tag, 'options': options}, f, indent=2, ensure_ascii=False)
+    json.dump({
+        'pinnedTag': tag,
+        'options': options,
+        'waiver': {
+            'property': WAIVER,
+            'flag': waiver_template.split(' ', 1)[0],
+            'template': waiver_template,
+            'description': waiver_description,
+        },
+    }, f, indent=2, ensure_ascii=False)
     f.write('\n')
 
 print('    %d draw options: %s' % (len(options), ' '.join(o['flag'] for o in options)))
