@@ -145,6 +145,19 @@ test('a theme the visitor opens is refused with its reasons, measured, and drawn
     await expect(page.locator('[data-verdict]')).toContainText('accepted');
     await expect(page.locator('[data-slug]')).not.toBeEmpty();
     await expect(page.locator('[data-refusal]')).toHaveCount(0);
+
+    // §3.7's one mechanical phase, on a theme that went through the protocol: thousands of
+    // draws taken apart against the file's own declarations, and nothing to report. That the
+    // filter can report anything at all is what tools/protocol asserts at build time — this
+    // is the half only a browser can say, since the sample is drawn in one.
+    await yours.getByRole('button', { name: 'Take a sample apart' }).click();
+
+    const sample = page.locator('[data-sample]');
+
+    await expect(sample).toBeVisible({ timeout: 120_000 });
+    await expect(sample).toContainText('slugs drawn and taken apart');
+    await expect(sample).toContainText('Every term stood where the file allows it');
+    await expect(page.locator('[data-faults]')).toHaveCount(0);
 });
 
 test('the home page shows a slug without loading the .NET runtime', async ({ page }) => {

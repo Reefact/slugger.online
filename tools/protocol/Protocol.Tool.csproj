@@ -1,0 +1,25 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>net10.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <RootNamespace>Slugger.Playground</RootNamespace>
+    <AssemblyName>protocol-check</AssemblyName>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <!--
+      THE FILTER ITSELF, compiled a second time rather than copied. A copy would be a second
+      implementation of the very thing this exists to keep honest, and it would drift the way
+      §10.4 says two wordings drift: in silence, both plausible, nothing comparing them.
+    -->
+    <Compile Include="../../apps/playground/Protocol.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Slugger.Core" />
+  </ItemGroup>
+
+</Project>

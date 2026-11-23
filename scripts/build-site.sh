@@ -12,6 +12,11 @@ cd "$root"
 # §11.7 — the comparison's editorial rules, and its freshness warning.
 node ./scripts/check-comparison.mjs
 
+# §3.7, §10.2 — the mechanical phase, on every published theme, and the negative control that
+# makes its silence mean something: a filter that never speaks proves nothing.
+echo "==> protocol: the mechanical phase, against the themes it will be offered"
+dotnet run --project tools/protocol/Protocol.Tool.csproj -c Release -- tools/catalogue/mirrored
+
 echo "==> site"
 pnpm --filter @slugger/site build
 

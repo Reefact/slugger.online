@@ -1608,6 +1608,7 @@ transformés en contrôles ; il est aussi la liste de ce qu'on saura *ne pas* av
 | La route d'un thème est indexée sur son nom de fichier, jamais sur son intitulé | 7.6 | Vérification de l'artefact |
 | Aucune description de thème que le thème ne déclare pas | 7.6, 14.2 | Génération au build ; une clé absente laisse la page muette |
 | Le playground ne présente aucun contrôle comme une validation du sens | 10.2 | Vérification des chaînes |
+| La phase mécanique accepte ce que le moteur tire, et refuse ce que le thème refuse | 3.7, 10.2 | `tools/protocol`, sur chaque thème publié, au build |
 | Aucun mot employé hors du vocabulaire de la bibliothèque | 5.9 | Vérification des chaînes, contre la surface publique |
 | Aucune métrique de qualité affichée | 5.10 | Vérification des chaînes |
 | Un littéral de couleur, d'espace ou de graisse hors de la source visuelle | 8.6 | Échec de build, des deux côtés |
