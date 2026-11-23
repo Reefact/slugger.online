@@ -235,17 +235,26 @@
 
                         @if (measured.Margins.Count > 0)
                         {
+                            @*
+                                The margin is the engine's own, sign included: four of these rules
+                                are floors and two are ceilings, so which side of a limit is the
+                                good side is not something a page may work out by comparing two
+                                numbers. It got that wrong once — 43 characters under a limit of 63
+                                read as a failure — which is exactly the divergence §10.4 forbids,
+                                arrived at through arithmetic rather than through prose.
+                            *@
                             <table class="margins">
                                 <thead>
-                                    <tr><th scope="col">Rule</th><th scope="col">Worst case</th><th scope="col">Limit</th><th scope="col">Subject</th></tr>
+                                    <tr><th scope="col">Rule</th><th scope="col">Worst case</th><th scope="col">Limit</th><th scope="col">Margin</th><th scope="col">Subject</th></tr>
                                 </thead>
                                 <tbody>
                                     @foreach (ThemeMargin margin in measured.Margins)
                                     {
-                                        <tr class="@(margin.WorstCase < margin.Limit ? "margin--under" : null)">
+                                        <tr class="@(margin.Margin < 0 ? "margin--under" : null)">
                                             <td>@margin.Rule</td>
                                             <td>@margin.WorstCase.ToString("N0")</td>
                                             <td>@margin.Limit.ToString("N0")</td>
+                                            <td>@margin.Margin.ToString("+#,##0;-#,##0;0")</td>
                                             <td>@margin.Subject@(margin.Beside is null ? null : $" beside {margin.Beside}")</td>
                                         </tr>
                                     }
