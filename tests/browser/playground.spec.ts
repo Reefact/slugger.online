@@ -1,3 +1,5 @@
+import { readFileSync } from 'node:fs';
+
 import { expect, test } from '@playwright/test';
 
 /**
@@ -33,21 +35,129 @@ test('the playground boots and draws a slug from the real engine', async ({ page
     expect(seen.size).toBeGreaterThan(1);
 });
 
-test('the engine offers the themes it ships, and the slug follows the casing asked for', async ({ page }) => {
+/**
+ * §10.2 asks for the CATALOGUE's themes, not the three the package embeds, and the ones it
+ * does not embed arrive as published files fetched at run time. Nothing in the artefact can
+ * say whether that fetch happens and whether the engine accepts what comes back: a file
+ * served as the wrong type, a policy that refuses the request, a theme the parser rejects
+ * all publish, all load, and all draw nothing. Only a rendered page says it.
+ */
+test('a theme the package does not embed is fetched and drawn, and an option changes the slug', async ({ page }) => {
     await page.goto('/playground/');
     await expect(page.locator('[data-slug]')).not.toBeEmpty({ timeout: 90_000 });
 
-    // The list comes from the engine (SluggerTheme.EmbeddedNames), so this asserts that it
-    // arrived rather than which names are in it — the names are the library's fact, not
-    // this repository's (§2).
-    const themes = page.getByLabel('Theme');
-    await expect(themes.locator('option')).not.toHaveCount(0);
+    const themes = page.getByRole('region', { name: 'Themes' });
 
-    await page.getByLabel('Casing').selectOption('Snake');
+    // Which themes exist is the library's fact, not this repository's (§2), so the one to
+    // exercise is read from the manifest the build published rather than written here.
+    const manifest: { name: string; origin: string }[] = await page.evaluate(() =>
+        fetch('themes/index.json').then(response => response.json()),
+    );
+
+    const mirrored = manifest.find(theme => theme.origin !== 'embedded');
+    const embedded = manifest.find(theme => theme.origin === 'embedded');
+
+    expect(mirrored, 'the catalogue holds a theme the package does not embed').toBeTruthy();
+    expect(embedded, 'the catalogue holds a theme the package embeds').toBeTruthy();
+    await expect(themes.getByRole('checkbox')).toHaveCount(manifest.length);
+
+    // Everything off but the repository theme, so the draw that follows can only have come
+    // through the fetch and SluggerTheme.LoadFromJson.
+    for (const theme of manifest) {
+        await themes.getByRole('checkbox', { name: theme.name, exact: true })
+            .setChecked(theme.name === mirrored!.name);
+    }
+
+    await expect(page.locator('[data-refusal]')).toHaveCount(0);
+    await expect(page.locator('[data-slug]')).not.toBeEmpty();
+
+    // An option is off until it is turned on, as a flag is until it is typed (§10.5). The
+    // label is the command's own template, so matching on the flag is matching on what the
+    // library wrote.
+    const options = page.getByRole('region', { name: 'Options' });
+
+    await options.getByRole('checkbox', { name: '--casing' }).check();
+    await options.getByRole('combobox').selectOption('Snake');
     await expect(page.locator('[data-slug]')).toContainText('_');
 
-    await page.getByLabel('Casing').selectOption('Kebab');
+    await options.getByRole('combobox').selectOption('Kebab');
     await expect(page.locator('[data-slug]')).toContainText('-');
+});
+
+/**
+ * §10.2's second use, and §4 calls its reader the best-served audience of this site. An
+ * author opens a file and is told, by the engine the command runs, every reason it would be
+ * refused — and is measured anyway, which is the case that matters.
+ *
+ * The theme used is the one §14.4 already keeps refused on purpose, so nothing is invented
+ * here and nothing has to stay refused by coincidence.
+ */
+test('a theme the visitor opens is refused with its reasons, measured, and drawn once waived', async ({ page }) => {
+    await page.goto('/playground/');
+    await expect(page.locator('[data-slug]')).not.toBeEmpty({ timeout: 90_000 });
+
+    const yours = page.getByRole('region', { name: 'Your theme' });
+    const hasty = readFileSync('apps/site/src/themes/hasty.json', 'utf8');
+
+    // Pasted, not typed. A theme runs to hundreds of kilobytes, and driving that through the
+    // input pipeline a character at a time takes minutes and exercises nothing: what a reader
+    // does is put the text in and leave the field, which is these two lines.
+    const paste = (text: string) =>
+        yours.locator('textarea').evaluate((node: HTMLTextAreaElement, value: string) => {
+            node.value = value;
+            node.dispatchEvent(new Event('change', { bubbles: true }));
+        }, text);
+
+    await paste(hasty);
+    await yours.getByRole('button', { name: 'Measure this theme' }).click();
+
+    await expect(page.locator('[data-verdict]')).toContainText('refused');
+
+    const reasons = page.locator('[data-reasons] li');
+    await expect(reasons.first()).toBeVisible();
+
+    // §10.4 — a terminal may say which flag to correct, because its reader has just typed
+    // one. A page may not: its reader may have installed nothing at all, which is exactly
+    // what §10.2 promises them. An em dash the library wrote must survive, so this looks for
+    // a flag and not for two hyphens.
+    expect(await page.locator('[data-reasons]').innerText()).not.toMatch(/--[a-z]/);
+
+    // Measured even while refused: an author wants to know by how much, not only that.
+    await expect(page.locator('.margins tbody tr').first()).toBeVisible();
+
+    // The floors lift for a file still being written, and that is all they lift. This theme is
+    // refused for its size AND for naming a category it does not declare; waiving the first
+    // must not whitewash the second, or the waiver would be telling an author their file is
+    // further along than it is.
+    const counted = await reasons.count();
+
+    await yours.getByRole('checkbox', { name: '--allow-small-theme' }).check();
+    await expect(reasons).not.toHaveCount(counted);
+    expect(await reasons.count()).toBeLessThan(counted);
+    await expect(page.locator('[data-verdict]')).toContainText('refused');
+
+    // A theme that does load is drawn without leaving the page (§10.2). Taken from the
+    // artefact rather than written here: a theme invented for a test is still an invented
+    // theme (§5.6).
+    await paste(readFileSync('dist/playground/themes/cocktails.json', 'utf8'));
+    await yours.getByRole('button', { name: 'Measure' }).click();
+
+    await expect(page.locator('[data-verdict]')).toContainText('accepted');
+    await expect(page.locator('[data-slug]')).not.toBeEmpty();
+    await expect(page.locator('[data-refusal]')).toHaveCount(0);
+
+    // §3.7's one mechanical phase, on a theme that went through the protocol: thousands of
+    // draws taken apart against the file's own declarations, and nothing to report. That the
+    // filter can report anything at all is what tools/protocol asserts at build time — this
+    // is the half only a browser can say, since the sample is drawn in one.
+    await yours.getByRole('button', { name: 'Take a sample apart' }).click();
+
+    const sample = page.locator('[data-sample]');
+
+    await expect(sample).toBeVisible({ timeout: 120_000 });
+    await expect(sample).toContainText('slugs drawn and taken apart');
+    await expect(sample).toContainText('Every term stood where the file allows it');
+    await expect(page.locator('[data-faults]')).toHaveCount(0);
 });
 
 test('the home page shows a slug without loading the .NET runtime', async ({ page }) => {

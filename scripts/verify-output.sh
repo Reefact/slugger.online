@@ -247,6 +247,91 @@ if grep -q 'slugger.online/issues/1' dist/why-slugger/index.html 2>/dev/null &&
     ok
 else bad "the invitation to correct us, or the date, is missing"; fi
 
+# §10.4 — the rule this document calls one of its most important: the site never carries a
+# SECOND wording of a refusal or a measurement. Two wordings drift apart at the first
+# correction and drift in silence, because both stay plausible and nothing compares them.
+# This is what compares them: every fixed sentence the engine's error model writes, taken at
+# the pin, against every component in this repository. A match is a copy.
+check "no second wording of anything the engine says (§10.4)"
+sentences="apps/site/src/generated/engine-sentences.txt"
+if [[ ! -s $sentences ]]; then
+    bad "$sentences is missing; run scripts/fetch-sentences.sh"
+else
+    copied="$(grep -rF -f "$sentences" apps/site/src apps/playground \
+        --include='*.astro' --include='*.razor' --include='*.ts' --include='*.cs' \
+        --exclude-dir=generated --exclude-dir=bin --exclude-dir=obj 2>/dev/null || true)"
+    if [[ -z $copied ]]; then ok; else bad "$copied"; fi
+fi
+
+# §10.4 — a sentence that names a command-line option is advice, and advice belongs to
+# neither side: a terminal may say which flag to correct because its reader has just typed
+# one; a page may not, because its reader may have installed nothing at all, which is exactly
+# what §10.2 promises them. Every refusal shown must therefore pass through the one place
+# that drops those sentences.
+check "every refusal shown is filtered of flag advice (§10.4)"
+unfiltered="$(grep -n 'DiagnosticMessage' apps/playground/*.razor 2>/dev/null | grep -v 'Reasons.Said' || true)"
+if [[ -z $unfiltered ]]; then ok; else bad "$unfiltered"; fi
+
+# §10.2 — the playground does not validate the MEANING of a theme and never claims to. The
+# phases of the protocol that find the most are human readings, and none of them automates. A
+# word like "valid" on this page would tell an author their theme is good where it says only
+# that the file holds together with what it declares.
+check "no control is presented as validating a theme's meaning (§10.2)"
+claims="$(grep -rniE '\b(valid|invalid|correct(ly)?|verified|approved|quality|score|rating)\b' \
+    apps/playground/Playground.razor 2>/dev/null || true)"
+if [[ -z $claims ]]; then ok; else bad "$claims"; fi
+
+# §10.5 — THE CONDITION OF PUBLISHING THE ROUTE, in that section's own words, not a later
+# improvement. The playground drives a fixed set of options: the command line's. A typed call
+# makes a RENAMED option a compilation error, which is why the bridge is one; it cannot make
+# an ADDED option anything at all. That is the drift this closes, and the only one left.
+#
+# The list it reads was taken from the library at the pin (scripts/fetch-options.sh), and the
+# bridge names each option with nameof(GenerationOptions.X), so both sides are mechanical.
+check "the playground offers every draw option the command does (§10.5)"
+bridge="apps/playground/DrawOptions.cs"
+# Only the arms of the switch, never the prose around them: this file explains itself with
+# the same nameof() it dispatches on, and a comment must not be able to satisfy a check.
+declared="$(grep -E '=>\s*options with' "$bridge" |
+    grep -oE 'nameof\(GenerationOptions\.[A-Za-z]+\)' | sed -E 's/.*\.([A-Za-z]+)\)/\1/' | sort -u)"
+# Read, not scraped: the file carries one other property key — the waiver of §10.2, which
+# shapes no draw and must not be in this list. A grep for the key would count it and fail the
+# check for being right.
+offered="$(python3 -I -c '
+import io, json
+with io.open("dist/playground/options.json", encoding="utf-8") as f:
+    print("\n".join(sorted(option["property"] for option in json.load(f)["options"])))
+')"
+if [[ -z $offered ]]; then
+    bad "dist/playground/options.json names no option"
+elif [[ "$declared" != "$offered" ]]; then
+    bad "$(printf 'the command offers:\n%s\nthe playground handles:\n%s' "$offered" "$declared")"
+else
+    ok
+fi
+
+# §10.2 — "the themes of the catalogue (§7.6)", which is seventeen, not the three the package
+# embeds. An embedded theme needs no file; every other one does, or the visitor picks a name
+# that cannot draw.
+check "every catalogue theme can be drawn in the playground (§10.2)"
+missing_theme=""
+while IFS= read -r line; do
+    name="${line%%|*}"
+    origin="${line##*|}"
+    [[ $origin == embedded ]] && continue
+    [[ -f "dist/playground/themes/${name}.json" ]] || missing_theme="${missing_theme}${name} "
+done < <(grep -oE '"name": "[^"]+"|"origin": "[^"]+"' dist/playground/themes/index.json |
+    sed -E 's/.*: "(.*)"/\1/' | paste -d'|' - -)
+catalogued="$(grep -c '"name"' apps/site/src/generated/catalogue.json || true)"
+published="$(grep -c '"name"' dist/playground/themes/index.json || true)"
+if [[ -n $missing_theme ]]; then
+    bad "no theme file published for: $missing_theme"
+elif [[ $catalogued -ne $published ]]; then
+    bad "the catalogue holds $catalogued themes, the playground is offered $published"
+else
+    ok
+fi
+
 # §8.5 — the mark. The reference check above already proves the three files are in the
 # artefact; this one proves every page still asks for them. The two failures it is for: a
 # layout that loses a link in a refactor, and the playground drifting away from the site it
