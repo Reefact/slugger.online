@@ -312,3 +312,8 @@ button {
 .margin--under td {
     color: var(--refused);
 }
+
+/* A count of slugs the file does not allow is a refusal, and wears the refusal's colour. */
+.refused-count {
+    color: var(--refused);
+}

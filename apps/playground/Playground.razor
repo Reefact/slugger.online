@@ -259,6 +259,49 @@
                     }
 
                     @*
+                        §3.7's protocol, and the ONE phase of it that is mechanical — never the
+                        others. The library says so itself: this check is a script you write, and
+                        the command has no option for it.
+                    *@
+                    @if (_protocol is not null)
+                    {
+                        <div class="controls">
+                            <button type="button" @onclick="RunProtocol" aria-busy="@_running">
+                                @(_running ? "Taking slugs apart…" : "Take a sample apart")
+                            </button>
+                        </div>
+
+                        @if (_checked is { } ran)
+                        {
+                            <p class="prose" data-sample>
+                                <strong>@ran.Drawn.ToString("N0")</strong> slugs drawn and taken apart.
+                                @if (ran.Faults.Count == 0)
+                                {
+                                    @:Every term stood where the file allows it.
+                                }
+                                else
+                                {
+                                    <strong class="refused-count">@ran.Faults.Count.ToString("N0")</strong>
+                                    @:of them hold a term the file does not allow there.
+                                }
+                            </p>
+
+                            @if (ran.Faults.Count > 0)
+                            {
+                                <ul class="reasons" data-faults>
+                                    @foreach (Fault fault in ran.Faults.Take(20))
+                                    {
+                                        <li>
+                                            <code class="code">@fault.Slug</code>
+                                            <span>@fault.Problem</span>
+                                        </li>
+                                    }
+                                </ul>
+                            }
+                        }
+                    }
+
+                    @*
                         §10.2 makes this limit a thing to write rather than leave to be guessed. The
                         phases of the protocol that find the most are human readings, and none of
                         them automates.
@@ -329,6 +372,9 @@
     private CatalogueTheme? _opened;
     private ThemeAnalysis? _analysis;
     private bool _measuring;
+    private Protocol? _protocol;
+    private Checked? _checked;
+    private bool _running;
 
     private string _slug = string.Empty;
     private string? _refusal;
@@ -437,12 +483,16 @@
             // seconds, for a theme of any size — and a theme the analysis refused cannot load
             // anyway, so that second parse would buy an error we have already been given, in
             // better words.
+            _protocol = null;
+            _checked = null;
+
             if (_analysis.IsAccepted) {
                 Outcome<SluggerTheme> loaded = SluggerTheme.LoadFromJson(_json, name, _waived);
                 if (loaded.Error is null) {
                     _opened = new CatalogueTheme(name, "opened");
                     _loaded[name] = loaded.GetResultOrThrow();
                     _chosen.Add(name);
+                    _protocol = Protocol.For(_json);
                 }
             }
         } finally {
@@ -489,6 +539,57 @@
             _slug = string.Empty;
             _combinations = 0;
             _refusal = refused.Message;
+        }
+
+        StateHasChanged();
+    }
+
+    private void RunProtocol() {
+        _ = RunProtocolAsync();
+    }
+
+    /// <summary>
+    ///     Draws a sample and takes every slug apart against the file's own declarations. The
+    ///     engine marks the term boundaries, because cutting a slug at its separators cannot tell a
+    ///     two-word term from two terms — a prefix is not a word.
+    /// </summary>
+    private async Task RunProtocolAsync() {
+        if (_protocol is not { } protocol || _opened is null) { return; }
+
+        _running = true;
+        _checked = null;
+        StateHasChanged();
+        await Task.Yield();
+
+        try {
+            SluggerTheme theme = _loaded[_opened.Name];
+
+            // Starting from the theme's own defaults keeps the segment mode and the word cap it
+            // promises, which the protocol says to pass rather than drop. What is overridden is
+            // only what would stop a drawn word matching the word in the file: the boundaries, the
+            // casing, the token, and any folding the theme asked for.
+            SlugGenerator generator = SlugGenerator.ForOrThrow(theme, defaults => defaults with {
+                Separator = Protocol.TermSeparator,
+                WordSeparator = Protocol.WordSeparator,
+                Casing = Casing.Kebab,
+                TokenLength = 0,
+                FoldAccents = false,
+                Ascii = false
+            });
+
+            List<Fault> faults = [];
+            int drawn = protocol.Sample;
+
+            for (int draw = 0; draw < drawn; draw += 1) {
+                string slug = generator.Next();
+                if (protocol.Fault(slug) is { } problem) { faults.Add(new Fault(slug, problem)); }
+            }
+
+            _checked = new Checked(drawn, faults);
+        } catch (Exception refused) {
+            _refusal = refused.Message;
+        } finally {
+            _running = false;
         }
 
         StateHasChanged();
